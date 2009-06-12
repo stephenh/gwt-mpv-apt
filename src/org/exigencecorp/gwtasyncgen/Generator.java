@@ -12,12 +12,13 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.JavaFileObject;
 import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
-import joist.sourcegen.GMethod;
-import joist.util.Copy;
 import joist.util.Join;
 
 public class Generator {
@@ -34,23 +35,48 @@ public class Generator {
 
     public void generate() {
         for (Element enclosed : this.element.getEnclosedElements()) {
-            if (enclosed.getModifiers().contains(Modifier.STATIC) || enclosed.getKind() != ElementKind.METHOD) {
-                continue;
+            if (this.isInstanceMethod(enclosed)) {
+                this.addMethod((ExecutableElement) enclosed);
             }
-            this.addMethod((ExecutableElement) enclosed);
         }
         this.saveCode();
     }
 
+    private boolean isInstanceMethod(Element enclosed) {
+        return enclosed.getKind() == ElementKind.METHOD && !enclosed.getModifiers().contains(Modifier.STATIC);
+    }
+
     private void addMethod(ExecutableElement method) {
         List<String> args = new ArrayList<String>();
+        this.addMethodArguments(method, args);
+        this.addCallbackArgument(method, args);
+
+        // This is an interface, so just touch the method
+        String nameAndArgs = method.getSimpleName() + "(" + Join.commaSpace(args) + ")";
+        this.asyncClass.getMethod(nameAndArgs);
+
+        this.asyncClass.addImports("com.google.gwt.user.client.rpc.AsyncCallback");
+    }
+
+    private void addMethodArguments(ExecutableElement method, List<String> args) {
         for (VariableElement var : method.getParameters()) {
             args.add(var.asType().toString() + " " + var.getSimpleName().toString());
         }
-        String nameAndArgs = method.getSimpleName().toString() + "(" + Join.commaSpace(args) + ")";
+    }
 
-        GMethod asyncMethod = this.asyncClass.getMethod(nameAndArgs);
-        asyncMethod.arguments(Copy.array(String.class, args));
+    private void addCallbackArgument(ExecutableElement method, List<String> args) {
+        String returnType = this.mungeReturnTypeToString(method.getReturnType());
+        args.add("AsyncCallback<" + returnType + "> callback");
+    }
+
+    private String mungeReturnTypeToString(TypeMirror returnType) {
+        if (returnType.getKind() == TypeKind.VOID) {
+            return "Void";
+        }
+        if (returnType instanceof PrimitiveType) {
+            returnType = this.processingEnv.getTypeUtils().boxedClass((PrimitiveType) returnType).asType();
+        }
+        return returnType.toString();
     }
 
     private void saveCode() {
