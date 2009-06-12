@@ -15,7 +15,7 @@ import javax.tools.Diagnostic.Kind;
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class Processor extends AbstractProcessor {
 
-    private static final String gwtAnnotationClassName = "com.google.gwt.user.client.rpc.RemoteServiceRelativePath";
+    public static final String gwtAnnotationClassName = "com.google.gwt.user.client.rpc.RemoteServiceRelativePath";
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
