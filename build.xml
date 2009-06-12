@@ -23,7 +23,7 @@
 			<fileset dir="src" includes="**/*" excludes="**/*.class"/>
 			<zipfileset dir="META-INF" includes="**/*" prefix="META-INF"/>
 			<zipfileset src="lib/main/commons-lang-2.3.jar"/>
-			<zipfileset src="lib/main/exigence-utilities.jar"/>
+			<zipfileset src="lib/main/joist.util.jar"/>
 			<rule pattern="org.apache.**" result="org.exigencecorp.gwtasyncgen.dependencies.org.apache.@1"/>
 			<rule pattern="joist.**" result="org.exigencecorp.gwtasyncgen.dependencies.joist.@1"/>
 		</jarjar>
