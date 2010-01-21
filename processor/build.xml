@@ -17,7 +17,6 @@
 		<mkdir dir="bin/main"/>
 		<javac srcdir="src" destdir="bin/main" debug="true" nowarn="yes" source="1.6" target="1.6" encoding="utf8">
 			<classpath>
-				<pathelement path="lib/main/commons-lang-2.3.jar"/>
 				<pathelement path="lib/main/joist.util.jar"/>
 			</classpath>
 		</javac>
@@ -29,7 +28,6 @@
 			<fileset dir="bin/main" includes="**/*.class"/>
 			<fileset dir="src" includes="**/*" excludes="**/*.class"/>
 			<zipfileset dir="META-INF" includes="**/*" prefix="META-INF"/>
-			<zipfileset src="lib/main/commons-lang-2.3.jar"/>
 			<zipfileset src="lib/main/joist.util.jar"/>
 			<rule pattern="org.apache.**" result="org.gwtasyncgen.dependencies.org.apache.@1"/>
 			<rule pattern="joist.**" result="org.gwtasyncgen.dependencies.joist.@1"/>
