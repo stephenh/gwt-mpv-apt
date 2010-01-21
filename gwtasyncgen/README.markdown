@@ -6,7 +6,7 @@ Install
 
 * Download gwtasyncgen, put it in your project's build path
 * In Eclipse, go to Project Settings, Java Compiler, Annotation Processing, and hit "Enable processing specific settings". Go to Factory path and hit "Enable project specific settings". Select the "gwtasyncgen.jar", hit Okay.
-* In javac, pass "-processor org.exigencecorp.gwtasyncgen.Processor"
+* In javac, pass "-processor org.gwtasyncgen.processor.Processor"
 
 For any service interfaces annotated with "RemoteServiceRelativePath", gwtasyncgen should pick them up and generate an async version. If you have existing async versions, you should get compile errors about having two versions.
 
