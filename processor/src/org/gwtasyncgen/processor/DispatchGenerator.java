@@ -3,10 +3,15 @@ package org.gwtasyncgen.processor;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
@@ -45,7 +50,16 @@ public class DispatchGenerator {
 		GMethod actionConstructor = this.actionClass.getConstructor();
 		GMethod resultConstructor = this.resultClass.getConstructor();
 
-		for (VariableElement field : ElementFilter.fieldsIn(this.processingEnv.getElementUtils().getAllMembers(this.element))) {
+		List<Element> copy = new ArrayList<Element>(this.element.getEnclosedElements());
+		Collections.sort(copy, new Comparator<Element>() {
+			@Override
+			public int compare(Element o1, Element o2) {
+				return o1.getSimpleName().toString().compareTo(o2.getSimpleName().toString());
+			}
+		});
+
+		// getAllMembers uses hash maps and so order is non-deterministic
+		for (VariableElement field : ElementFilter.fieldsIn(copy)) {
 			String specName = field.getSimpleName().toString();
 			String specType = field.asType().toString();
 
