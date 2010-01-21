@@ -2,14 +2,11 @@ package org.gwtasyncgen.processor;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -31,17 +28,14 @@ public class DispatchGenerator {
 	public DispatchGenerator(ProcessingEnvironment processingEnv, TypeElement element) {
 		this.processingEnv = processingEnv;
 		String base = element.toString().replaceAll("Spec$", "");
-		String date = new SimpleDateFormat("yyyy MMM dd hh:mm").format(new Date());
 
 		this.actionClass = new GClass(base + "Action");
 		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
 		this.actionClass.implementsInterface("net.customware.gwt.dispatch.shared.Action<{}>", base + "Result");
-		this.actionClass.addImports(Generated.class).addAnnotation("@Generated(value = \"" + Processor.class.getName() + "\", date = \"" + date + "\")");
 
 		this.resultClass = new GClass(base + "Result");
 		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
 		this.resultClass.implementsInterface("net.customware.gwt.dispatch.shared.Result");
-		this.resultClass.addImports(Generated.class).addAnnotation("@Generated(value = \"" + Processor.class.getName() + "\", date = \"" + date + "\")");
 
 		this.element = element;
 	}
