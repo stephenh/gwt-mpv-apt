@@ -58,7 +58,7 @@ public class DispatchGenerator {
 			String specType = field.asType().toString();
 
 			if (specName.startsWith("in") && specName.length() > 2) {
-				String name = lower(specName.substring(2)); // strip in
+				String name = lower(stripPrefix(specName, "in"));
 
 				actionClass.getField(name).type(specType);
 				actionClass.getMethod("get" + upper(name)).returnType(specType).body.append("return this.{};", name);
@@ -68,7 +68,7 @@ public class DispatchGenerator {
 			}
 
 			if (specName.startsWith("out") && specName.length() > 3) {
-				String name = lower(specName.substring(3)); // strip out
+				String name = lower(stripPrefix(specName, "out"));
 
 				resultClass.getField(name).type(specType);
 				resultClass.getMethod("get" + upper(name)).returnType(specType).body.append("return this.{};", name);
@@ -84,6 +84,14 @@ public class DispatchGenerator {
 
 		this.saveCode(this.actionClass);
 		this.saveCode(this.resultClass);
+	}
+
+	private String stripPrefix(String name, String prefix) {
+		String withoutPrefix = name.substring(prefix.length());
+		if (withoutPrefix.length() > 1 && withoutPrefix.substring(0, 1).matches("[0-9]")) {
+			return withoutPrefix.substring(1);
+		}
+		return withoutPrefix;
 	}
 
 	private String upper(String name) {

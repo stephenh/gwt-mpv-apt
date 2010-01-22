@@ -3,15 +3,15 @@ package com.foo.client.dispatch;
 import org.gwtasyncgen.GenDispatch;
 
 @GenDispatch
-public class FooSpec {
+public class BarSpec {
 
 	Integer inInteger;
-	String outFoo;
-	Integer outBar;
+	String out1foo;
+	Integer out2bar;
 
 	// Shouldn't really put stuff here, but checking compile time order
 	public void foo() {
-		new FooResult(1, "2"); // alphabetical not expected
+		new BarResult("2", 1);
 	}
-
+	
 }
