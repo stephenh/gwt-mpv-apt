@@ -12,8 +12,9 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
 import org.gwtasyncgen.GenDispatch;
+import org.gwtasyncgen.GenEvent;
 
-@SupportedAnnotationTypes( { Processor.gwtAnnotationClassName, "org.gwtasyncgen.GenDispatch" })
+@SupportedAnnotationTypes( { Processor.gwtAnnotationClassName, "org.gwtasyncgen.GenDispatch", "org.gwtasyncgen.GenEvent" })
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class Processor extends AbstractProcessor {
 
@@ -31,6 +32,12 @@ public class Processor extends AbstractProcessor {
 		for (Element element : roundEnv.getElementsAnnotatedWith(GenDispatch.class)) {
 			if (element.getKind() == ElementKind.CLASS) {
 				new DispatchGenerator(this.processingEnv, (TypeElement) element).generate();
+			}
+		}
+		
+		for (Element element : roundEnv.getElementsAnnotatedWith(GenEvent.class)) {
+			if (element.getKind() == ElementKind.CLASS) {
+				new EventGenerator(this.processingEnv, (TypeElement) element, element.getAnnotation(GenEvent.class)).generate();
 			}
 		}
 

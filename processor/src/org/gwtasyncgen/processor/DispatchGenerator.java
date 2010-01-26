@@ -1,32 +1,21 @@
 package org.gwtasyncgen.processor;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
-import javax.tools.JavaFileObject;
-import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
 
 public class DispatchGenerator {
 
-	private final ProcessingEnvironment processingEnv;
+	private final ProcessingEnvironment env;
 	private final TypeElement element;
 	private final GClass actionClass;
 	private final GClass resultClass;
 
-	public DispatchGenerator(ProcessingEnvironment processingEnv, TypeElement element) {
-		this.processingEnv = processingEnv;
+	public DispatchGenerator(ProcessingEnvironment env, TypeElement element) {
+		this.env = env;
 		String base = element.toString().replaceAll("Spec$", "");
 
 		this.actionClass = new GClass(base + "Action");
@@ -44,16 +33,8 @@ public class DispatchGenerator {
 		GMethod actionConstructor = this.actionClass.getConstructor();
 		GMethod resultConstructor = this.resultClass.getConstructor();
 
-		List<Element> copy = new ArrayList<Element>(this.element.getEnclosedElements());
-		Collections.sort(copy, new Comparator<Element>() {
-			@Override
-			public int compare(Element o1, Element o2) {
-				return o1.getSimpleName().toString().compareTo(o2.getSimpleName().toString());
-			}
-		});
-
 		// getAllMembers uses hash maps and so order is non-deterministic
-		for (VariableElement field : ElementFilter.fieldsIn(copy)) {
+		for (VariableElement field : Util.getFieldsSorted(element)) {
 			String specName = field.getSimpleName().toString();
 			String specType = field.asType().toString();
 
@@ -82,8 +63,8 @@ public class DispatchGenerator {
 		this.actionClass.getConstructor().setProtected();
 		this.resultClass.getConstructor().setProtected();
 
-		this.saveCode(this.actionClass);
-		this.saveCode(this.resultClass);
+		Util.saveCode(env, this.actionClass);
+		Util.saveCode(env, this.resultClass);
 	}
 
 	private String stripPrefix(String name, String prefix) {
@@ -100,17 +81,6 @@ public class DispatchGenerator {
 
 	private String lower(String name) {
 		return name.substring(0, 1).toLowerCase() + name.substring(1);
-	}
-
-	private void saveCode(GClass g) {
-		try {
-			JavaFileObject jfo = this.processingEnv.getFiler().createSourceFile(g.getFullClassNameWithoutGeneric(), this.element);
-			Writer w = jfo.openWriter();
-			w.write(g.toCode());
-			w.close();
-		} catch (IOException io) {
-			this.processingEnv.getMessager().printMessage(Kind.ERROR, io.getMessage());
-		}
 	}
 
 }

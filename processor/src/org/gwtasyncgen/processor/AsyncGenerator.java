@@ -1,7 +1,5 @@
 package org.gwtasyncgen.processor;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,24 +16,22 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.JavaFileObject;
-import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
 import joist.util.Join;
 
 public class AsyncGenerator {
 
-	private final ProcessingEnvironment processingEnv;
+	private final ProcessingEnvironment env;
 	private final TypeElement element;
 	private final GClass asyncClass;
 
-	public AsyncGenerator(ProcessingEnvironment processingEnv, TypeElement element) {
-		this.processingEnv = processingEnv;
+	public AsyncGenerator(ProcessingEnvironment env, TypeElement element) {
+		this.env = env;
 		this.element = element;
-		
+
 		this.asyncClass = new GClass(this.element.toString() + "Async");
-		
+
 		String date = new SimpleDateFormat("yyyy MMM dd hh:mm").format(new Date());
 		this.asyncClass.addImports(Generated.class).addAnnotation("@Generated(value = \"" + Processor.class.getName() + "\", date = \"" + date + "\")");
 	}
@@ -46,7 +42,7 @@ public class AsyncGenerator {
 				this.addMethod((ExecutableElement) enclosed);
 			}
 		}
-		this.saveCode();
+		Util.saveCode(env, asyncClass);
 	}
 
 	private boolean isInstanceMethod(Element enclosed) {
@@ -81,20 +77,9 @@ public class AsyncGenerator {
 			return "Void";
 		}
 		if (returnType instanceof PrimitiveType) {
-			returnType = this.processingEnv.getTypeUtils().boxedClass((PrimitiveType) returnType).asType();
+			returnType = this.env.getTypeUtils().boxedClass((PrimitiveType) returnType).asType();
 		}
 		return returnType.toString();
-	}
-
-	private void saveCode() {
-		try {
-			JavaFileObject jfo = this.processingEnv.getFiler().createSourceFile(this.asyncClass.getFullClassNameWithoutGeneric(), this.element);
-			Writer w = jfo.openWriter();
-			w.write(this.asyncClass.toCode());
-			w.close();
-		} catch (IOException io) {
-			this.processingEnv.getMessager().printMessage(Kind.ERROR, io.getMessage());
-		}
 	}
 
 }
