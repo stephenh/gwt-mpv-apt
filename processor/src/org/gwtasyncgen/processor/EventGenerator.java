@@ -42,6 +42,7 @@ public class EventGenerator {
 
 	private void generateType() {
 		eventClass.getField("TYPE").setStatic().setPublic().setFinal().type("Type<{}>", handlerName).initialValue("new Type<{}>()", handlerName);
+		eventClass.getMethod("getType").setStatic().returnType("Type<{}>", handlerName).body.append("return TYPE;");
 		eventClass.getMethod("getAssociatedType").returnType("Type<{}>", handlerName).addAnnotation("@Override").body.line("return TYPE;");
 	}
 
