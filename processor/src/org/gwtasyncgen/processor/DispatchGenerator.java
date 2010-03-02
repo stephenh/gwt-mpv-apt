@@ -3,6 +3,7 @@ package org.gwtasyncgen.processor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
@@ -14,7 +15,12 @@ public class DispatchGenerator {
 	private final GClass actionClass;
 	private final GClass resultClass;
 
-	public DispatchGenerator(ProcessingEnvironment env, TypeElement element) {
+	public DispatchGenerator(ProcessingEnvironment env, TypeElement element) throws InvalidTypeElementException {
+		if (!element.toString().endsWith("Spec")) {
+			env.getMessager().printMessage(Kind.ERROR, "GenDispatch targets must end with a Spec suffix");
+			throw new InvalidTypeElementException();
+		}
+
 		this.env = env;
 		String base = element.toString().replaceAll("Spec$", "");
 
