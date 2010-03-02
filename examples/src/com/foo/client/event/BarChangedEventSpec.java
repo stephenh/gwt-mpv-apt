@@ -2,8 +2,8 @@ package com.foo.client.event;
 
 import org.gwtasyncgen.GenEvent;
 
-@GenEvent
-public class FooChangedEventSpec {
+@GenEvent(methodName = "onBarDone")
+public class BarChangedEventSpec {
 	Integer fooId;
 }
 

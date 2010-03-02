@@ -37,7 +37,7 @@ public class EventGenerator {
 	private void generateInnerInterface() {
 		GClass inner = eventClass.getInnerClass(handlerName);
 		inner.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
-		inner.getMethod(eventSpec.methodName()).argument(eventClass.getFullClassName(), "event");
+		inner.getMethod(getMethodName()).argument(eventClass.getFullClassName(), "event");
 	}
 
 	private void generateType() {
@@ -49,7 +49,7 @@ public class EventGenerator {
 	private void generateDispatch() {
 		eventClass.getMethod("dispatch").setProtected().addAnnotation("@Override").argument(handlerName, "handler").body.line(
 			"handler.{}(this);",
-			eventSpec.methodName());
+			getMethodName());
 	}
 
 	private void generateFields() {
@@ -81,6 +81,14 @@ public class EventGenerator {
 
 	private String lower(String name) {
 		return name.substring(0, 1).toLowerCase() + name.substring(1);
+	}
+
+	private String getMethodName() {
+		if (eventSpec.methodName().length() > 0) {
+			return eventSpec.methodName();
+		} else {
+			return "on" + element.getSimpleName().toString().replaceAll("EventSpec$", "");
+		}
 	}
 
 }
