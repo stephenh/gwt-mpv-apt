@@ -3,6 +3,7 @@ package org.gwtasyncgen.processor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
@@ -17,7 +18,12 @@ public class EventGenerator {
 	private final GenEvent eventSpec;
 	private final String handlerName;
 
-	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) {
+	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException{
+		if (!element.toString().endsWith("EventSpec")) {
+			env.getMessager().printMessage(Kind.ERROR, "GenEvent target must end with a suffix EventSpec");
+			throw new InvalidTypeElementException();
+		}
+
 		this.env = env;
 		this.element = element;
 		this.eventClass = new GClass(element.toString().replaceAll("Spec$", ""));
@@ -37,7 +43,7 @@ public class EventGenerator {
 	private void generateInnerInterface() {
 		GClass inner = eventClass.getInnerClass(handlerName);
 		inner.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
-		inner.getMethod(eventSpec.methodName()).argument(eventClass.getFullClassName(), "event");
+		inner.getMethod(getMethodName()).argument(eventClass.getFullClassName(), "event");
 	}
 
 	private void generateType() {
@@ -49,7 +55,7 @@ public class EventGenerator {
 	private void generateDispatch() {
 		eventClass.getMethod("dispatch").setProtected().addAnnotation("@Override").argument(handlerName, "handler").body.line(
 			"handler.{}(this);",
-			eventSpec.methodName());
+			getMethodName());
 	}
 
 	private void generateFields() {
@@ -81,6 +87,14 @@ public class EventGenerator {
 
 	private String lower(String name) {
 		return name.substring(0, 1).toLowerCase() + name.substring(1);
+	}
+
+	private String getMethodName() {
+		if (eventSpec.methodName().length() > 0) {
+			return eventSpec.methodName();
+		} else {
+			return "on" + element.getSimpleName().toString().replaceAll("EventSpec$", "");
+		}
 	}
 
 }
