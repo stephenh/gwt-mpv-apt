@@ -3,6 +3,7 @@ package org.gwtasyncgen.processor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
@@ -17,7 +18,12 @@ public class EventGenerator {
 	private final GenEvent eventSpec;
 	private final String handlerName;
 
-	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) {
+	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException{
+		if (!element.toString().endsWith("EventSpec")) {
+			env.getMessager().printMessage(Kind.ERROR, "GenEvent target must end with a suffix EventSpec");
+			throw new InvalidTypeElementException();
+		}
+
 		this.env = env;
 		this.element = element;
 		this.eventClass = new GClass(element.toString().replaceAll("Spec$", ""));

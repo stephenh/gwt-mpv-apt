@@ -41,7 +41,11 @@ public class Processor extends AbstractProcessor {
 
 		for (Element element : roundEnv.getElementsAnnotatedWith(GenEvent.class)) {
 			if (element.getKind() == ElementKind.CLASS) {
-				new EventGenerator(this.processingEnv, (TypeElement) element, element.getAnnotation(GenEvent.class)).generate();
+				try {
+					new EventGenerator(this.processingEnv, (TypeElement) element, element.getAnnotation(GenEvent.class)).generate();
+				} catch (InvalidTypeElementException itee) {
+					// continue
+				}
 			}
 		}
 
