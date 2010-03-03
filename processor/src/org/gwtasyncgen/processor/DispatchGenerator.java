@@ -73,9 +73,9 @@ public class DispatchGenerator {
 			equals.body.line("    return true"); // leave open
 			for (Prop p : properties) {
 				if (Primitives.isPrimitive(p.type)) {
-					equals.body.line("        && (o.{} == this.{})", p.name, p.name);
+					equals.body.line("        && o.{} == this.{}", p.name, p.name);
 				} else if (p.type.endsWith("[]")) {
-					equals.body.line("        && (java.util.Arrays.deepEquals(o.{}, this.{}))", p.name, p.name);
+					equals.body.line("        && java.util.Arrays.deepEquals(o.{}, this.{})", p.name, p.name);
 				} else {
 					equals.body.line(
 						"        && ((o.{} == null && this.{} == null) || (o.{} != null && o.{}.equals(this.{})))",
