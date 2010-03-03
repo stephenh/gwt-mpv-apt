@@ -52,6 +52,7 @@ public class DispatchGenerator {
 
 		GMethod hashCode = gclass.getMethod("hashCode").addAnnotation("@Override").returnType("int");
 		hashCode.body.line("int result = 23;");
+		hashCode.body.line("result = (result * 37) + getClass().hashCode();");
 		for (Prop p : properties) {
 			if (Primitives.isPrimitive(p.type)) {
 				hashCode.body.line("result = (result * 37) + new {}({}).hashCode();", Primitives.getWrapper(p.type), p.name);
@@ -65,32 +66,35 @@ public class DispatchGenerator {
 
 		GMethod equals = gclass.getMethod("equals").addAnnotation("@Override").argument("Object", "other").returnType("boolean");
 		equals.body.line("if (other != null && other.getClass().equals(this.getClass())) {");
-		equals.body.line("    {} o = ({}) other;", gclass.getSimpleClassName(), gclass.getSimpleClassName());
-		equals.body.line("    return true"); // leave open
-		for (Prop p : properties) {
-			if (Primitives.isPrimitive(p.type)) {
-				equals.body.line("        && (o.{} == this.{})", p.name, p.name);
-			} else if (p.type.endsWith("[]")) {
-				equals.body.line(
-					"        && (java.util.Arrays.deepEquals(o.{}, this.{}))",
-					p.name,
-					p.name);
-			} else {
-				equals.body.line(
-					"        && ((o.{} == null && this.{} == null) || (o.{} != null && o.{}.equals(this.{})))",
-					p.name,
-					p.name,
-					p.name,
-					p.name,
-					p.name);
+		if (properties.size() == 0) {
+			equals.body.line("    return true;");
+		} else {
+			equals.body.line("    {} o = ({}) other;", gclass.getSimpleClassName(), gclass.getSimpleClassName());
+			equals.body.line("    return true"); // leave open
+			for (Prop p : properties) {
+				if (Primitives.isPrimitive(p.type)) {
+					equals.body.line("        && (o.{} == this.{})", p.name, p.name);
+				} else if (p.type.endsWith("[]")) {
+					equals.body.line("        && (java.util.Arrays.deepEquals(o.{}, this.{}))", p.name, p.name);
+				} else {
+					equals.body.line(
+						"        && ((o.{} == null && this.{} == null) || (o.{} != null && o.{}.equals(this.{})))",
+						p.name,
+						p.name,
+						p.name,
+						p.name,
+						p.name);
+				}
 			}
+			equals.body.line("       ;");
 		}
-		equals.body.line("       ;");
 		equals.body.line("}");
 		equals.body.line("return false;");
 
-		// re-add the default constructor for serialization
-		gclass.getConstructor().setProtected();
+		if (properties.size() > 0) {
+			// re-add the default constructor for serialization
+			gclass.getConstructor().setProtected();
+		}
 
 		Util.saveCode(env, gclass);
 	}
