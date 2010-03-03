@@ -20,7 +20,6 @@ Examples
 
 If you type:
 
-{{{
     @GenDispatch
     public class SubmitUserSpec {
       Integer in1id;
@@ -29,7 +28,6 @@ If you type:
       boolean out1success;
       String[] out2messages;
     }
-}}}
 
 `gwtasyncgen` will generate two classes, `SubmitUserAction` and `SubmitUserResult`. `SubmitUserAction` will have fields, getters, and a constructor (or two as needed for serialization) for `id` and `name`. `SubmitResultResult` will have the same for `success`, and `messages`. `equals` and `hashCode` are also correctly implemented if you need it for caching/etc. purposes.
 
@@ -46,13 +44,11 @@ Notes:
 
 If you type:
 
-{{{
     @GenEvent
     public class FooChangedEventSpec {
       Foo p1foo;
       boolean p2originator;
     }
-}}}
 
 `gwtasyncgen` will generate two classes, `FooChangedEvent` and `FooChangedHandler`. `FooChangedEvent` will have fields, getters, and a constructor for `foo` and `originator`, plus static `getType()`, instance `dispatch`, etc., for it to function correctly as a `GwtEvent`. `FooChangedHandler` will be an interface with a `onFooChanged` method that takes a `FooChangedEvent` parameter.
 
