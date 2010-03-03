@@ -1,5 +1,9 @@
 
-`gwtasyncgen` is a Java 6 annotation processor to help generate some of the boilerplate code involved in GWT projects. It currently will generate:
+`gwtasyncgen` is a Java 6 annotation processor to help generate some of the boilerplate code involved in GWT projects.
+
+Annotation processors enable compiler-/IDE-driven generated-as-you-type code generation based on Java files in your project.
+
+`gwtasyncgen` currently will generate:
 
 * `XxxAsync` interfaces as you change the source interfaces annotated with `@RemoteServiceRelativePath`
 * `XxxAction/XxxResult` DTOs for [gwt-dispatch](http://code.google.com/p/gwt-dispatch/) as you change the `XxxSpec` class annotated with `@GenDispatch`
