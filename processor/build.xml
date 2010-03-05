@@ -31,6 +31,8 @@
 			<zipfileset src="lib/main/joist.util.jar"/>
 			<rule pattern="org.apache.**" result="org.gwtasyncgen.dependencies.org.apache.@1"/>
 			<rule pattern="joist.**" result="org.gwtasyncgen.dependencies.joist.@1"/>
+			<!-- include the super source for @Generated -->
+			<fileset dir="super" includes="**/*.java"/>
 		</jarjar>
 		<zip destfile="bin/gwtasyncgen.zip">
 			<fileset dir="src" includes="**/*.java"/>

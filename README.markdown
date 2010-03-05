@@ -80,7 +80,6 @@ Todo
 ====
 
 * Handle base classes
-* Add super source for javax Generated annotation?
 * Builder/fluent methods?
 * Default values in the spec
 * Mutable fields on the event, e.g. claimed
