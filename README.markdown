@@ -1,7 +1,10 @@
 
-`gwtasyncgen` is a Java 6 annotation processor to help generate some of the boilerplate code involved in GWT projects. It currently will generate:
+`gwtasyncgen` is a Java 6 annotation processor to help generate some of the boilerplate code involved in GWT projects.
 
-* `XxxAsync` interfaces as you change the source interfaces annotated with `@RemoteServiceRelativePath`
+Annotation processors enable compiler-/IDE-driven generated-as-you-type code generation based on Java files in your project.
+
+`gwtasyncgen` currently will generate:
+
 * `XxxAction/XxxResult` DTOs for [gwt-dispatch](http://code.google.com/p/gwt-dispatch/) as you change the `XxxSpec` class annotated with `@GenDispatch`
 * `XxxEvent/XxxHandler` events for GWT events as you change the `XxxEventSpec` class annotated with `@GenEvent`
 
@@ -20,7 +23,6 @@ Examples
 
 If you type:
 
-{{{
     @GenDispatch
     public class SubmitUserSpec {
       Integer in1id;
@@ -29,7 +31,6 @@ If you type:
       boolean out1success;
       String[] out2messages;
     }
-}}}
 
 `gwtasyncgen` will generate two classes, `SubmitUserAction` and `SubmitUserResult`. `SubmitUserAction` will have fields, getters, and a constructor (or two as needed for serialization) for `id` and `name`. `SubmitResultResult` will have the same for `success`, and `messages`. `equals` and `hashCode` are also correctly implemented if you need it for caching/etc. purposes.
 
@@ -46,13 +47,11 @@ Notes:
 
 If you type:
 
-{{{
     @GenEvent
     public class FooChangedEventSpec {
       Foo p1foo;
       boolean p2originator;
     }
-}}}
 
 `gwtasyncgen` will generate two classes, `FooChangedEvent` and `FooChangedHandler`. `FooChangedEvent` will have fields, getters, and a constructor for `foo` and `originator`, plus static `getType()`, instance `dispatch`, etc., for it to function correctly as a `GwtEvent`. `FooChangedHandler` will be an interface with a `onFooChanged` method that takes a `FooChangedEvent` parameter.
 
@@ -81,15 +80,7 @@ Todo
 ====
 
 * Handle base classes
-* Handle generics? Hopefully not
-* Add super source for javax Generated annotation?
 * Builder/fluent methods?
 * Default values in the spec
 * Mutable fields on the event, e.g. claimed
-
-Other Projects
-==============
-
-* [gwt-rpc-annotation](http://code.google.com/p/gwt-rpc-annotation/) has a spiffy implementation that makes both interfaces
-
 

@@ -14,21 +14,12 @@ import javax.lang.model.element.TypeElement;
 import org.gwtasyncgen.GenDispatch;
 import org.gwtasyncgen.GenEvent;
 
-@SupportedAnnotationTypes( { Processor.gwtAnnotationClassName, "org.gwtasyncgen.GenDispatch", "org.gwtasyncgen.GenEvent" })
+@SupportedAnnotationTypes( { "org.gwtasyncgen.GenDispatch", "org.gwtasyncgen.GenEvent" })
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class Processor extends AbstractProcessor {
 
-	public static final String gwtAnnotationClassName = "com.google.gwt.user.client.rpc.RemoteServiceRelativePath";
-
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		TypeElement remoteService = this.processingEnv.getElementUtils().getTypeElement(gwtAnnotationClassName);
-		for (Element element : roundEnv.getElementsAnnotatedWith(remoteService)) {
-			if (element.getKind() == ElementKind.INTERFACE) {
-				new AsyncGenerator(this.processingEnv, (TypeElement) element).generate();
-			}
-		}
-
 		for (Element element : roundEnv.getElementsAnnotatedWith(GenDispatch.class)) {
 			if (element.getKind() == ElementKind.CLASS) {
 				try {

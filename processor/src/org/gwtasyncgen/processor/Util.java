@@ -2,11 +2,14 @@ package org.gwtasyncgen.processor;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -18,7 +21,7 @@ import javax.tools.Diagnostic.Kind;
 import joist.sourcegen.GClass;
 
 public class Util {
-	
+
 	public static List<? extends VariableElement> getFieldsSorted(TypeElement element) {
 		// getAllMembers uses hash maps and so order is non-deterministic
 		List<Element> copy = new ArrayList<Element>(element.getEnclosedElements());
@@ -30,7 +33,7 @@ public class Util {
 		});
 		return ElementFilter.fieldsIn(copy);
 	}
-	
+
 	public static void saveCode(ProcessingEnvironment env, GClass g, Element... originals) {
 		try {
 			JavaFileObject jfo = env.getFiler().createSourceFile(g.getFullClassNameWithoutGeneric(), originals);
@@ -40,6 +43,13 @@ public class Util {
 		} catch (IOException io) {
 			env.getMessager().printMessage(Kind.ERROR, io.getMessage());
 		}
+	}
+
+	public static void addGenerated(GClass gclass, Class<?> processorClass) {
+		String value = processorClass.getName();
+		String date = new SimpleDateFormat("dd MMM yyyy hh:mm").format(new Date());
+		gclass.addImports(Generated.class);
+		gclass.addAnnotation("@Generated(value = \"" + value + "\", date = \"" + date + "\")");
 	}
 
 }

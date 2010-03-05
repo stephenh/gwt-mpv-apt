@@ -17,8 +17,9 @@ public class EventGenerator {
 	private final GClass eventClass;
 	private final GenEvent eventSpec;
 	private final String handlerName;
+	private final GenericSuffix generics;
 
-	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException{
+	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("EventSpec")) {
 			env.getMessager().printMessage(Kind.ERROR, "GenEvent target must end with a suffix EventSpec");
 			throw new InvalidTypeElementException();
@@ -26,10 +27,14 @@ public class EventGenerator {
 
 		this.env = env;
 		this.element = element;
-		this.eventClass = new GClass(element.toString().replaceAll("Spec$", ""));
+		this.generics = new GenericSuffix(element);
+		this.eventClass = new GClass(element.toString().replaceAll("Spec$", "") + generics.varsWithBounds);
 		this.eventSpec = eventSpec;
 		this.handlerName = element.getSimpleName().toString().replaceAll("EventSpec$", "Handler");
-		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName);
+		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
+			+ generics.vars);
+
+		Util.addGenerated(this.eventClass, DispatchGenerator.class);
 	}
 
 	public void generate() {
@@ -41,19 +46,29 @@ public class EventGenerator {
 	}
 
 	private void generateInnerInterface() {
-		GClass inner = eventClass.getInnerClass(handlerName);
+		GClass inner = eventClass.getInnerClass(handlerName + generics.varsWithBounds);
 		inner.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
-		inner.getMethod(getMethodName()).argument(eventClass.getFullClassName(), "event");
+		inner.getMethod(getMethodName()).argument(eventClass.getFullClassNameWithoutGeneric() + generics.vars, "event");
 	}
 
 	private void generateType() {
-		eventClass.getField("TYPE").setStatic().setPublic().setFinal().type("Type<{}>", handlerName).initialValue("new Type<{}>()", handlerName);
-		eventClass.getMethod("getType").setStatic().returnType("Type<{}>", handlerName).body.append("return TYPE;");
-		eventClass.getMethod("getAssociatedType").returnType("Type<{}>", handlerName).addAnnotation("@Override").body.line("return TYPE;");
+		eventClass.getField("TYPE").setStatic().setPublic().setFinal().type("Type<{}>", handlerName + generics.varsAsStatic).initialValue(
+			"new Type<{}>()",
+			handlerName + generics.varsAsStatic);
+		eventClass.getMethod("getType").setStatic().returnType("Type<{}>", handlerName + generics.varsAsStatic).body.append("return TYPE;");
+
+		GMethod associatedType = eventClass.getMethod("getAssociatedType");
+		associatedType.returnType("Type<{}>", handlerName + generics.vars).addAnnotation("@Override");
+		if (generics.vars.length() > 0) {
+			associatedType.addAnnotation("@SuppressWarnings(\"unchecked\")");
+			associatedType.body.line("return (Type) TYPE;");
+		} else {
+			associatedType.body.line("return TYPE;");
+		}
 	}
 
 	private void generateDispatch() {
-		eventClass.getMethod("dispatch").setProtected().addAnnotation("@Override").argument(handlerName, "handler").body.line(
+		eventClass.getMethod("dispatch").setProtected().addAnnotation("@Override").argument(handlerName + generics.vars, "handler").body.line(
 			"handler.{}(this);",
 			getMethodName());
 	}

@@ -1,5 +1,6 @@
 package com.foo.client;
 
+import com.foo.client.dispatch.BarAction;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,6 +35,8 @@ public class Foo implements EntryPoint {
 		final Button sendButton = new Button("Send");
 		final TextBox nameField = new TextBox();
 		nameField.setText("GWT User");
+
+		new BarAction(1); // nothing listening on the server just yet
 
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");

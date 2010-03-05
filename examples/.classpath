@@ -9,7 +9,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/annotations.jar"/>
-	<classpathentry kind="lib" path="/home/stephen/bizo/ivycache/gwt-dispatch/gwt-dispatch/jars/gwt-dispatch-1.0.0.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dispatch-1.1.0-2010012501.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
