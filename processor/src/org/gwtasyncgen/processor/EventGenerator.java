@@ -1,12 +1,17 @@
 package org.gwtasyncgen.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
+import joist.util.Join;
 
 import org.gwtasyncgen.GenEvent;
 
@@ -17,19 +22,37 @@ public class EventGenerator {
 	private final GClass eventClass;
 	private final GenEvent eventSpec;
 	private final String handlerName;
+	private final String genericSuffix;
+	private final String genericSuffixStatic;
 
-	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException{
+	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("EventSpec")) {
 			env.getMessager().printMessage(Kind.ERROR, "GenEvent target must end with a suffix EventSpec");
 			throw new InvalidTypeElementException();
 		}
 
+		final List<String> generics = new ArrayList<String>();
+		final List<String> genericsStatic = new ArrayList<String>();
+		for (TypeParameterElement tpe : element.getTypeParameters()) {
+			generics.add(tpe.toString());
+			genericsStatic.add("?");
+		}
+		if (generics.size() > 0) {
+			genericSuffix = "<" + Join.comma(generics) + ">";
+			genericSuffixStatic = "<" + Join.comma(genericsStatic) + ">";
+		} else {
+			genericSuffix = "";
+			genericSuffixStatic = "";
+		}
+
 		this.env = env;
 		this.element = element;
-		this.eventClass = new GClass(element.toString().replaceAll("Spec$", ""));
+		this.eventClass = new GClass(element.toString().replaceAll("Spec$", "") + genericSuffix);
 		this.eventSpec = eventSpec;
 		this.handlerName = element.getSimpleName().toString().replaceAll("EventSpec$", "Handler");
-		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName);
+		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
+			+ genericSuffix);
+
 	}
 
 	public void generate() {
@@ -41,19 +64,29 @@ public class EventGenerator {
 	}
 
 	private void generateInnerInterface() {
-		GClass inner = eventClass.getInnerClass(handlerName);
+		GClass inner = eventClass.getInnerClass(handlerName + genericSuffix);
 		inner.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
 		inner.getMethod(getMethodName()).argument(eventClass.getFullClassName(), "event");
 	}
 
 	private void generateType() {
-		eventClass.getField("TYPE").setStatic().setPublic().setFinal().type("Type<{}>", handlerName).initialValue("new Type<{}>()", handlerName);
-		eventClass.getMethod("getType").setStatic().returnType("Type<{}>", handlerName).body.append("return TYPE;");
-		eventClass.getMethod("getAssociatedType").returnType("Type<{}>", handlerName).addAnnotation("@Override").body.line("return TYPE;");
+		eventClass.getField("TYPE").setStatic().setPublic().setFinal().type("Type<{}>", handlerName + genericSuffixStatic).initialValue(
+			"new Type<{}>()",
+			handlerName + genericSuffixStatic);
+		eventClass.getMethod("getType").setStatic().returnType("Type<{}>", handlerName + genericSuffixStatic).body.append("return TYPE;");
+
+		GMethod associatedType = eventClass.getMethod("getAssociatedType");
+		associatedType.returnType("Type<{}>", handlerName + genericSuffix).addAnnotation("@Override");
+		if (genericSuffix.length() > 0) {
+			associatedType.addAnnotation("@SuppressWarnings(\"unchecked\")");
+			associatedType.body.line("return (Type) TYPE;");
+		} else {
+			associatedType.body.line("return TYPE;");
+		}
 	}
 
 	private void generateDispatch() {
-		eventClass.getMethod("dispatch").setProtected().addAnnotation("@Override").argument(handlerName, "handler").body.line(
+		eventClass.getMethod("dispatch").setProtected().addAnnotation("@Override").argument(handlerName + genericSuffix, "handler").body.line(
 			"handler.{}(this);",
 			getMethodName());
 	}
