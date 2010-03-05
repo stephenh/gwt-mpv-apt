@@ -81,7 +81,6 @@ Todo
 ====
 
 * Handle base classes
-* Handle generics? Hopefully not
 * Add super source for javax Generated annotation?
 * Builder/fluent methods?
 * Default values in the spec

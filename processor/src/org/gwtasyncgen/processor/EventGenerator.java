@@ -1,18 +1,12 @@
 package org.gwtasyncgen.processor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
-import joist.util.Join;
 
 import org.gwtasyncgen.GenEvent;
 
@@ -23,9 +17,7 @@ public class EventGenerator {
 	private final GClass eventClass;
 	private final GenEvent eventSpec;
 	private final String handlerName;
-	private final String genericSuffix;
-	private final String genericSuffixBounds;
-	private final String genericSuffixStatic;
+	private final GenericSuffix generics;
 
 	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("EventSpec")) {
@@ -33,40 +25,14 @@ public class EventGenerator {
 			throw new InvalidTypeElementException();
 		}
 
-		// TODO: Move this to processors util
-		final List<String> generics = new ArrayList<String>();
-		final List<String> genericsBounds = new ArrayList<String>();
-		final List<String> genericsStatic = new ArrayList<String>();
-		for (TypeParameterElement tpe : element.getTypeParameters()) {
-			List<String> bounds = new ArrayList<String>();
-			for (TypeMirror tm : tpe.getBounds()) {
-				bounds.add("extends " + tm.toString());
-			}
-			if (bounds.size() > 0) {
-				genericsBounds.add(tpe.toString() + " " + Join.commaSpace(bounds));
-			} else {
-				genericsBounds.add(tpe.toString());
-			}
-			generics.add(tpe.toString());
-			genericsStatic.add("?");
-		}
-		if (generics.size() > 0) {
-			genericSuffix = "<" + Join.commaSpace(generics) + ">";
-			genericSuffixBounds = "<" + Join.commaSpace(genericsBounds) + ">";
-			genericSuffixStatic = "<" + Join.commaSpace(genericsStatic) + ">";
-		} else {
-			genericSuffix = "";
-			genericSuffixBounds = "";
-			genericSuffixStatic = "";
-		}
-
 		this.env = env;
 		this.element = element;
-		this.eventClass = new GClass(element.toString().replaceAll("Spec$", "") + genericSuffixBounds);
+		this.generics = new GenericSuffix(element);
+		this.eventClass = new GClass(element.toString().replaceAll("Spec$", "") + generics.varsWithBounds);
 		this.eventSpec = eventSpec;
 		this.handlerName = element.getSimpleName().toString().replaceAll("EventSpec$", "Handler");
 		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
-			+ genericSuffix);
+			+ generics.vars);
 
 	}
 
@@ -79,20 +45,20 @@ public class EventGenerator {
 	}
 
 	private void generateInnerInterface() {
-		GClass inner = eventClass.getInnerClass(handlerName + genericSuffixBounds);
+		GClass inner = eventClass.getInnerClass(handlerName + generics.varsWithBounds);
 		inner.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
-		inner.getMethod(getMethodName()).argument(eventClass.getFullClassNameWithoutGeneric() + genericSuffix, "event");
+		inner.getMethod(getMethodName()).argument(eventClass.getFullClassNameWithoutGeneric() + generics.vars, "event");
 	}
 
 	private void generateType() {
-		eventClass.getField("TYPE").setStatic().setPublic().setFinal().type("Type<{}>", handlerName + genericSuffixStatic).initialValue(
+		eventClass.getField("TYPE").setStatic().setPublic().setFinal().type("Type<{}>", handlerName + generics.varsAsStatic).initialValue(
 			"new Type<{}>()",
-			handlerName + genericSuffixStatic);
-		eventClass.getMethod("getType").setStatic().returnType("Type<{}>", handlerName + genericSuffixStatic).body.append("return TYPE;");
+			handlerName + generics.varsAsStatic);
+		eventClass.getMethod("getType").setStatic().returnType("Type<{}>", handlerName + generics.varsAsStatic).body.append("return TYPE;");
 
 		GMethod associatedType = eventClass.getMethod("getAssociatedType");
-		associatedType.returnType("Type<{}>", handlerName + genericSuffix).addAnnotation("@Override");
-		if (genericSuffix.length() > 0) {
+		associatedType.returnType("Type<{}>", handlerName + generics.vars).addAnnotation("@Override");
+		if (generics.vars.length() > 0) {
 			associatedType.addAnnotation("@SuppressWarnings(\"unchecked\")");
 			associatedType.body.line("return (Type) TYPE;");
 		} else {
@@ -101,7 +67,7 @@ public class EventGenerator {
 	}
 
 	private void generateDispatch() {
-		eventClass.getMethod("dispatch").setProtected().addAnnotation("@Override").argument(handlerName + genericSuffix, "handler").body.line(
+		eventClass.getMethod("dispatch").setProtected().addAnnotation("@Override").argument(handlerName + generics.vars, "handler").body.line(
 			"handler.{}(this);",
 			getMethodName());
 	}
