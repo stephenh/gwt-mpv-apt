@@ -34,6 +34,7 @@ public class EventGenerator {
 		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
 			+ generics.vars);
 
+		Util.addGenerated(this.eventClass, DispatchGenerator.class);
 	}
 
 	public void generate() {

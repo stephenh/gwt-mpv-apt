@@ -37,6 +37,9 @@ public class DispatchGenerator {
 		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
 		this.resultClass.implementsInterface("net.customware.gwt.dispatch.shared.Result");
 
+		Util.addGenerated(this.actionClass, DispatchGenerator.class);
+		Util.addGenerated(this.resultClass, DispatchGenerator.class);
+
 		this.element = element;
 	}
 
@@ -67,7 +70,7 @@ public class DispatchGenerator {
 		hashCode.body.line("return result;");
 
 		GMethod equals = gclass.getMethod("equals").addAnnotation("@Override").argument("Object", "other").returnType("boolean");
-		if (generics.vars.length()>0) {
+		if (generics.vars.length() > 0) {
 			equals.addAnnotation("@SuppressWarnings(\"unchecked\")");
 		}
 		equals.body.line("if (other != null && other.getClass().equals(this.getClass())) {");
