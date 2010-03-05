@@ -7,6 +7,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
@@ -23,6 +24,7 @@ public class EventGenerator {
 	private final GenEvent eventSpec;
 	private final String handlerName;
 	private final String genericSuffix;
+	private final String genericSuffixBounds;
 	private final String genericSuffixStatic;
 
 	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException {
@@ -31,23 +33,36 @@ public class EventGenerator {
 			throw new InvalidTypeElementException();
 		}
 
+		// TODO: Move this to processors util
 		final List<String> generics = new ArrayList<String>();
+		final List<String> genericsBounds = new ArrayList<String>();
 		final List<String> genericsStatic = new ArrayList<String>();
 		for (TypeParameterElement tpe : element.getTypeParameters()) {
+			List<String> bounds = new ArrayList<String>();
+			for (TypeMirror tm : tpe.getBounds()) {
+				bounds.add("extends " + tm.toString());
+			}
+			if (bounds.size() > 0) {
+				genericsBounds.add(tpe.toString() + " " + Join.commaSpace(bounds));
+			} else {
+				genericsBounds.add(tpe.toString());
+			}
 			generics.add(tpe.toString());
 			genericsStatic.add("?");
 		}
 		if (generics.size() > 0) {
-			genericSuffix = "<" + Join.comma(generics) + ">";
-			genericSuffixStatic = "<" + Join.comma(genericsStatic) + ">";
+			genericSuffix = "<" + Join.commaSpace(generics) + ">";
+			genericSuffixBounds = "<" + Join.commaSpace(genericsBounds) + ">";
+			genericSuffixStatic = "<" + Join.commaSpace(genericsStatic) + ">";
 		} else {
 			genericSuffix = "";
+			genericSuffixBounds = "";
 			genericSuffixStatic = "";
 		}
 
 		this.env = env;
 		this.element = element;
-		this.eventClass = new GClass(element.toString().replaceAll("Spec$", "") + genericSuffix);
+		this.eventClass = new GClass(element.toString().replaceAll("Spec$", "") + genericSuffixBounds);
 		this.eventSpec = eventSpec;
 		this.handlerName = element.getSimpleName().toString().replaceAll("EventSpec$", "Handler");
 		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
@@ -64,9 +79,9 @@ public class EventGenerator {
 	}
 
 	private void generateInnerInterface() {
-		GClass inner = eventClass.getInnerClass(handlerName + genericSuffix);
+		GClass inner = eventClass.getInnerClass(handlerName + genericSuffixBounds);
 		inner.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
-		inner.getMethod(getMethodName()).argument(eventClass.getFullClassName(), "event");
+		inner.getMethod(getMethodName()).argument(eventClass.getFullClassNameWithoutGeneric() + genericSuffix, "event");
 	}
 
 	private void generateType() {
