@@ -5,7 +5,6 @@ Annotation processors enable compiler-/IDE-driven generated-as-you-type code gen
 
 `gwtasyncgen` currently will generate:
 
-* `XxxAsync` interfaces as you change the source interfaces annotated with `@RemoteServiceRelativePath`
 * `XxxAction/XxxResult` DTOs for [gwt-dispatch](http://code.google.com/p/gwt-dispatch/) as you change the `XxxSpec` class annotated with `@GenDispatch`
 * `XxxEvent/XxxHandler` events for GWT events as you change the `XxxEventSpec` class annotated with `@GenEvent`
 
@@ -85,10 +84,4 @@ Todo
 * Builder/fluent methods?
 * Default values in the spec
 * Mutable fields on the event, e.g. claimed
-
-Other Projects
-==============
-
-* [gwt-rpc-annotation](http://code.google.com/p/gwt-rpc-annotation/) has a spiffy implementation that makes both interfaces
-
 
