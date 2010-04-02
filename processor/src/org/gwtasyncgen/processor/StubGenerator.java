@@ -59,7 +59,7 @@ public class StubGenerator {
 	}
 
 	private void generateMethod(ExecutableElement method) {
-		if (method.getThrownTypes().size() > 0 || method.getParameters().size() > 0) {
+		if (method.getThrownTypes().size() > 0) {
 			return;
 		}
 
@@ -79,15 +79,20 @@ public class StubGenerator {
 			stubType = stubConfig.get(returnType);
 		}
 
-		if (stubType == null) {
-			return;
+		if (stubType != null && method.getParameters().size() == 0) {
+			stubClass.getField(methodName).setPublic().setFinal().type(stubType).initialValue("new {}()", stubType);
+			stubClass.getMethod(methodName).returnType(stubType).body.line("return {};", methodName);
+		} else {
+			String nameWithArgs = methodName + "(" + Join.commaSpace(Util.getArguments(method)) + ")";
+			if (method.getReturnType().getKind() == TypeKind.VOID) {
+				// TODO handle overloaded method names
+				stubClass.getField(methodName).setPublic().type("int").initialValue("0");
+				stubClass.getMethod(nameWithArgs).body.line("{}++;", methodName);
+			} else {
+				GMethod m = stubClass.getMethod(nameWithArgs).returnType(method.getReturnType().toString());
+				m.body.line("throw new UnsupportedOperationException(\"This is a stub.\");");
+			}
 		}
-
-		GField f = stubClass.getField(methodName).setPublic().setFinal().type(stubType);
-		f.initialValue("new {}()", stubType);
-
-		GMethod m = stubClass.getMethod(methodName).returnType(stubType);
-		m.body.line("return {};", methodName);
 	}
 
 	private String getNameWithStubPrefix(TypeElement type) {
