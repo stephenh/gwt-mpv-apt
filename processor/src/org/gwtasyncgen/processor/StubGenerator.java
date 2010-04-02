@@ -10,7 +10,6 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 
 import joist.sourcegen.GClass;
-import joist.sourcegen.GField;
 import joist.sourcegen.GMethod;
 import joist.util.Join;
 
@@ -33,7 +32,7 @@ public class StubGenerator {
 		this.generics = new GenericSuffix(element);
 
 		final String fullName;
-		if ("".equals(annotation.name())) {
+		if ("".equals(this.annotation.name())) {
 			fullName = getNameWithStubPrefix(element);
 		} else {
 			if (annotation.name().indexOf(".") > -1) {
