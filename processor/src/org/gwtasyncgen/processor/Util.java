@@ -12,13 +12,17 @@ import java.util.List;
 import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.JavaFileObject;
 import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
+import joist.util.Join;
 
 public class Util {
 
@@ -50,6 +54,32 @@ public class Util {
 		String date = new SimpleDateFormat("dd MMM yyyy hh:mm").format(new Date());
 		gclass.addImports(Generated.class);
 		gclass.addAnnotation("@Generated(value = \"" + value + "\", date = \"" + date + "\")");
+	}
+	
+	public static List<String> getArguments(ExecutableElement method) {
+		List<String> args = new ArrayList<String>();
+		for (VariableElement parameter : method.getParameters()) {
+			args.add(parameter.asType().toString() + " " + parameter.getSimpleName());
+		}
+		return args;
+	}
+
+	public static List<String> getTypeParameters(ExecutableElement method) {
+		List<String> params = new ArrayList<String>();
+		if (method.getTypeParameters().size() != 0) {
+			for (TypeParameterElement p : method.getTypeParameters()) {
+				String base = p.toString();
+				if (p.getBounds().size() > 0) {
+					List<String> bounds = new ArrayList<String>();
+					for (TypeMirror tm : p.getBounds()) {
+						bounds.add(tm.toString());
+					}
+					base += " extends " + Join.join(bounds, " & ");
+				}
+				params.add(base);
+			}
+		}
+		return params;
 	}
 
 }
