@@ -3,19 +3,55 @@ package org.gwtasyncgen.processor;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import joist.util.Join;
 
 public class GenericSuffix {
 	
-	public final String vars;
-	public final String varsWithBounds;
-	public final String varsAsStatic;
+	public String without;
+	public String vars;
+	public String varsWithBounds;
+	public String varsAsStatic;
+	public String varsAsArguments;
 
+	public GenericSuffix(ProcessingEnvironment env, DeclaredType type) {
+		setWithout(type.toString());
+		probeElement((TypeElement) env.getTypeUtils().asElement(type));
+		probeType(type);
+	}
+	
 	public GenericSuffix(TypeElement element) {
+		setWithout(element.toString());
+		probeElement(element);
+		varsAsArguments = "";
+	}
+	
+	private void setWithout(String name) {
+		if (name.indexOf("<") > -1) {
+			without = name.substring(0, name.indexOf("<"));
+		} else {
+			without = name;
+		}
+	}
+	
+	private void probeType(DeclaredType type) {
+		final List<String> typeArguments = new ArrayList<String>();
+		for (TypeMirror tm : type.getTypeArguments()) {
+			typeArguments.add(tm.toString());
+		}
+		if (typeArguments.size() > 0) {
+  		varsAsArguments = "<" + Join.commaSpace(typeArguments) + ">";
+		} else {
+			varsAsArguments = "";
+		}
+	}
+	
+	private void probeElement(TypeElement element) {
 		final List<String> generics = new ArrayList<String>();
 		final List<String> genericsBounds = new ArrayList<String>();
 		final List<String> genericsStatic = new ArrayList<String>();
