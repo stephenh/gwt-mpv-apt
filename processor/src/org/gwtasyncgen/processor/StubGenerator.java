@@ -25,13 +25,13 @@ public class StubGenerator {
 	private final GenericSuffix generics;
 	private final GClass stubClass;
 
-	public StubGenerator(ProcessingEnvironment env, Map<String,String> stubConfig, TypeElement element, GenStub annotation) {
+	public StubGenerator(ProcessingEnvironment env, Map<String, String> stubConfig, TypeElement element, GenStub annotation) {
 		this.env = env;
-		this.stubConfig=stubConfig;
+		this.stubConfig = stubConfig;
 		this.element = element;
 		this.annotation = annotation;
 		this.generics = new GenericSuffix(element);
-		
+
 		final String fullName;
 		if ("".equals(annotation.name())) {
 			fullName = getNameWithStubPrefix(element);
@@ -69,10 +69,14 @@ public class StubGenerator {
 		if (method.getReturnType().getKind() == TypeKind.DECLARED) {
 			GenericSuffix returnTypeGenerics = new GenericSuffix(env, (DeclaredType) method.getReturnType());
 			returnType = method.getReturnType().toString();
-		  stubType = stubConfig.get(returnTypeGenerics.without) + returnTypeGenerics.varsAsArguments;
+			if (stubConfig.containsKey(returnTypeGenerics.without)) {
+				stubType = stubConfig.get(returnTypeGenerics.without) + returnTypeGenerics.varsAsArguments;
+			} else {
+				stubType = null;
+			}
 		} else {
 			returnType = method.getReturnType().toString();
-		  stubType = stubConfig.get(returnType);
+			stubType = stubConfig.get(returnType);
 		}
 
 		if (stubType == null) {
@@ -91,7 +95,7 @@ public class StubGenerator {
 		parts[parts.length - 1] = "Stub" + stripi(parts[parts.length - 1]);
 		return Join.join(parts, ".");
 	}
-	
+
 	private String stripi(String part) {
 		if (part.matches("^I[A-Z].+")) {
 			return part.substring(1);
