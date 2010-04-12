@@ -4,6 +4,6 @@ import org.gwtasyncgen.GenEvent;
 
 @GenEvent
 public class FooChangedEventSpec {
-	Integer fooId;
+	Integer p1fooId;
 }
 

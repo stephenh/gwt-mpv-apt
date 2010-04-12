@@ -4,6 +4,6 @@ import org.gwtasyncgen.GenEvent;
 
 @GenEvent(methodName = "onBarDone")
 public class BarChangedEventSpec {
-	Integer fooId;
+	Integer p1fooId;
 }
 

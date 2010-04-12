@@ -4,6 +4,6 @@ import org.gwtasyncgen.GenEvent;
 
 @GenEvent
 public class GenericChangedEventSpec<T> {
-	T t;
+	T p1t;
 }
 

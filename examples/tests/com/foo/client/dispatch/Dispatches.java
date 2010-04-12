@@ -17,6 +17,13 @@ public class Dispatches {
 		// flip the params, ensure no ClassCastException
 		System.out.println(new GenericAction<String, Number>("a", 1).equals(new GenericAction<Number, Number>(1, 1)));
 		System.out.println(new GenericAction<Number, Number>(1, 1).equals(new GenericAction<String, Number>("a", 1)));
+
+		// no NPEs
+		System.out.println(new BarAction(null).hashCode() == new BarAction(null).hashCode());
+		System.out.println(new BarAction(null).equals(new BarAction(null)));
+
+		System.out.println(new BarAction(1).toString());
+		System.out.println(new BarAction(null).toString());
 	}
 
 }

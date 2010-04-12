@@ -4,7 +4,7 @@ import org.gwtasyncgen.GenEvent;
 
 @GenEvent
 public class BoundsChangedEventSpec<T extends Number, U extends Number> {
-	T t;
-	U u;
+	T p1t;
+	U p2u;
 }
 

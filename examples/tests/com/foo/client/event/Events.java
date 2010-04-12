@@ -28,6 +28,13 @@ public class Events {
 			}
 		});
 
+		System.out.println(new BarChangedEvent(1));
+		System.out.println(new BarChangedEvent(null));
+		System.out.println(new BoundsChangedEvent<Number, Number>(1, 2));
+
+		System.out.println(new BarChangedEvent(1).equals(new BarChangedEvent(1)));
+		System.out.println(new BarChangedEvent(1).equals(new BarChangedEvent(2)));
+
 		t.fireEvent(new GenericChangedEvent<String>("foo"));
 		// t.fireEvent(new GenericChangedEvent<Integer>(1));
 	}
