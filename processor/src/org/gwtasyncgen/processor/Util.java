@@ -110,6 +110,23 @@ public class Util {
 		hashCode.body.line("return result;");
 	}
 
+	public static void addToString(GClass gclass, List<Prop> properties) {
+		GMethod tos = gclass.getMethod("toString").addAnnotation("@Override").returnType("String");
+		tos.body.line("return \"{}[\"", gclass.getSimpleClassNameWithoutGeneric());
+		int i = 0;
+		for (Prop p : properties) {
+			if (p.type.endsWith("[]")) {
+				tos.body.line("    + java.util.Arrays.toString({})", p.name);
+			} else {
+				tos.body.line("    + {}", p.name);
+			}
+			if (i++ < properties.size() - 1) {
+				tos.body.line("    + \",\"");
+			}
+		}
+		tos.body.line("    + \"]\";");
+	}
+
 	public static void addEquals(GClass gclass, GenericSuffix generics, List<Prop> properties) {
 		GMethod equals = gclass.getMethod("equals").addAnnotation("@Override").argument("Object", "other").returnType("boolean");
 		if (generics.vars.length() > 0) {

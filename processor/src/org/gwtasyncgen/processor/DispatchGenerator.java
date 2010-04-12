@@ -58,6 +58,7 @@ public class DispatchGenerator {
 		}
 		Util.addHashCode(gclass, properties);
 		Util.addEquals(gclass, generics, properties);
+		Util.addToString(gclass, properties);
 		Util.saveCode(env, gclass);
 	}
 

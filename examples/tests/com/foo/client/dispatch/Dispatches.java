@@ -21,6 +21,9 @@ public class Dispatches {
 		// no NPEs
 		System.out.println(new BarAction(null).hashCode() == new BarAction(null).hashCode());
 		System.out.println(new BarAction(null).equals(new BarAction(null)));
+
+		System.out.println(new BarAction(1).toString());
+		System.out.println(new BarAction(null).toString());
 	}
 
 }
