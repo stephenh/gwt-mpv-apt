@@ -64,7 +64,7 @@ public class DispatchGenerator {
 			} else if (p.type.endsWith("[]")) {
 				hashCode.body.line("result = (result * 37) + java.util.Arrays.deepHashCode({});", p.name);
 			} else {
-				hashCode.body.line("result = (result * 37) + {}.hashCode();", p.name);
+				hashCode.body.line("result = (result * 37) + ({} == null ? 1 : {}.hashCode());", p.name, p.name);
 			}
 		}
 		hashCode.body.line("return result;");
