@@ -1,8 +1,9 @@
 package org.gwtasyncgen.processor;
 
+import java.util.List;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic.Kind;
 
 import joist.sourcegen.GClass;
@@ -18,6 +19,7 @@ public class EventGenerator {
 	private final GenEvent eventSpec;
 	private final String handlerName;
 	private final GenericSuffix generics;
+	private final List<Prop> properties;
 
 	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("EventSpec")) {
@@ -34,7 +36,7 @@ public class EventGenerator {
 		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
 			+ generics.vars);
 
-		Util.addGenerated(this.eventClass, DispatchGenerator.class);
+		properties = Util.getProperties(element, "p");
 	}
 
 	public void generate() {
@@ -42,6 +44,8 @@ public class EventGenerator {
 		generateType();
 		generateDispatch();
 		generateFields();
+		Util.addToString(eventClass, properties);
+		Util.addGenerated(eventClass, DispatchGenerator.class);
 		Util.saveCode(env, eventClass);
 	}
 
@@ -75,33 +79,13 @@ public class EventGenerator {
 
 	private void generateFields() {
 		GMethod cstr = eventClass.getConstructor();
+		for (Prop p : properties) {
+			eventClass.getField(p.name).type(p.type).setFinal();
+			eventClass.getMethod("get" + Util.upper(p.name)).returnType(p.type).body.append("return {};", p.name);
 
-		for (VariableElement field : Util.getFieldsSorted(element)) {
-			String specName = field.getSimpleName().toString();
-			String specType = field.asType().toString();
-			String name = lower(stripPrefix(specName));
-
-			eventClass.getField(name).type(specType).setFinal();
-			eventClass.getMethod("get" + upper(name)).returnType(specType).body.append("return {};", name);
-
-			cstr.argument(specType, name);
-			cstr.body.line("this.{} = {};", name, name);
+			cstr.argument(p.type, p.name);
+			cstr.body.line("this.{} = {};", p.name, p.name);
 		}
-	}
-
-	private String stripPrefix(String name) {
-		if (name.length() > 2 && name.substring(0, 2).matches("p[0-9]")) {
-			return name.substring(2);
-		}
-		return name;
-	}
-
-	private String upper(String name) {
-		return name.substring(0, 1).toUpperCase() + name.substring(1);
-	}
-
-	private String lower(String name) {
-		return name.substring(0, 1).toLowerCase() + name.substring(1);
 	}
 
 	private String getMethodName() {
