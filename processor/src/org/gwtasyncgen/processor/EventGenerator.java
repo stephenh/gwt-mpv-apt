@@ -44,6 +44,8 @@ public class EventGenerator {
 		generateType();
 		generateDispatch();
 		generateFields();
+		Util.addEquals(eventClass, generics, properties);
+		Util.addHashCode(eventClass, properties);
 		Util.addToString(eventClass, properties);
 		Util.addGenerated(eventClass, DispatchGenerator.class);
 		Util.saveCode(env, eventClass);
