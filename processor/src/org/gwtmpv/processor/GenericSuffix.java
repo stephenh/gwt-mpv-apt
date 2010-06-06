@@ -1,4 +1,4 @@
-package org.gwtasyncgen.processor;
+package org.gwtmpv.processor;
 
 import java.util.ArrayList;
 import java.util.List;

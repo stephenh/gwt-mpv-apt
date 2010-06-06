@@ -1,6 +1,6 @@
 package com.foo.client.dispatch;
 
-import org.gwtasyncgen.GenDispatch;
+import org.gwtmpv.GenDispatch;
 
 @GenDispatch
 public class NoArgSpec {

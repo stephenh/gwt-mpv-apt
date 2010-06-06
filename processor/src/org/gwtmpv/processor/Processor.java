@@ -1,4 +1,4 @@
-package org.gwtasyncgen.processor;
+package org.gwtmpv.processor;
 
 import java.util.Set;
 
@@ -11,10 +11,10 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
-import org.gwtasyncgen.GenDispatch;
-import org.gwtasyncgen.GenEvent;
+import org.gwtmpv.GenDispatch;
+import org.gwtmpv.GenEvent;
 
-@SupportedAnnotationTypes( { "org.gwtasyncgen.GenDispatch", "org.gwtasyncgen.GenEvent" })
+@SupportedAnnotationTypes( { "org.gwtmpv.GenDispatch", "org.gwtmpv.GenEvent" })
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class Processor extends AbstractProcessor {
 

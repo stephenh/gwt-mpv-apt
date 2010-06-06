@@ -1,4 +1,4 @@
-package org.gwtasyncgen.processor;
+package org.gwtmpv.processor;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import javax.tools.Diagnostic.Kind;
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
 
-import org.gwtasyncgen.GenEvent;
+import org.gwtmpv.GenEvent;
 
 public class EventGenerator {
 
