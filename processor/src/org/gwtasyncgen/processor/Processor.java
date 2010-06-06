@@ -1,6 +1,5 @@
 package org.gwtasyncgen.processor;
 
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -14,20 +13,13 @@ import javax.lang.model.element.TypeElement;
 
 import org.gwtasyncgen.GenDispatch;
 import org.gwtasyncgen.GenEvent;
-import org.gwtasyncgen.GenStub;
 
-@SupportedAnnotationTypes( { "org.gwtasyncgen.GenDispatch", "org.gwtasyncgen.GenEvent", "org.gwtasyncgen.GenStub" })
+@SupportedAnnotationTypes( { "org.gwtasyncgen.GenDispatch", "org.gwtasyncgen.GenEvent" })
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class Processor extends AbstractProcessor {
 
-	private Map<String, String> stubConfig;
-	
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		if (stubConfig == null) {
-			stubConfig = ConfUtil.loadProperties(processingEnv, "stubgen.properties");
-		}
-		
 		for (Element element : roundEnv.getElementsAnnotatedWith(GenDispatch.class)) {
 			if (element.getKind() == ElementKind.CLASS) {
 				try {
@@ -45,12 +37,6 @@ public class Processor extends AbstractProcessor {
 				} catch (InvalidTypeElementException itee) {
 					// continue
 				}
-			}
-		}
-
-		for (Element element : roundEnv.getElementsAnnotatedWith(GenStub.class)) {
-			if (element.getKind() == ElementKind.INTERFACE) {
-				new StubGenerator(this.processingEnv, stubConfig, (TypeElement) element, element.getAnnotation(GenStub.class)).generate();
 			}
 		}
 
