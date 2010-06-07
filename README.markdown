@@ -1,9 +1,9 @@
 
-`gwtasyncgen` is a Java 6 annotation processor to help generate some of the boilerplate code involved in GWT projects.
+`gwt-mpv-apt` is a Java 6 annotation processor to help generate some of the boilerplate code involved in GWT projects.
 
 Annotation processors enable compiler-/IDE-driven generated-as-you-type code generation based on Java files in your project.
 
-`gwtasyncgen` currently will generate:
+`gwt-mpv-apt` currently will generate:
 
 * `XxxAction/XxxResult` DTOs for [gwt-dispatch](http://code.google.com/p/gwt-dispatch/) as you change the `XxxSpec` class annotated with `@GenDispatch`
 * `XxxEvent/XxxHandler` events for GWT events as you change the `XxxEventSpec` class annotated with `@GenEvent`
@@ -11,8 +11,8 @@ Annotation processors enable compiler-/IDE-driven generated-as-you-type code gen
 Install
 =======
 
-* Download `gwtasyncgen.jar`, put it in your project's classpath
-* In Eclipse, go to Project Settings, Java Compiler, Annotation Processing, and hit "Enable processing specific settings". Go to Factory path and hit "Enable project specific settings". Select the `gwtasyncgen.jar`, hit Okay.
+* Download `gwt-mpv-apt.jar`, put it in your project's classpath
+* In Eclipse, go to Project Settings, Java Compiler, Annotation Processing, and hit "Enable processing specific settings". Go to Factory path and hit "Enable project specific settings". Select the `gwt-mpv-apt.jar`, hit Okay.
 * For `javac`, use JDK6 and it will pick up the processor from your classpath automatically
 
 Examples
@@ -32,15 +32,16 @@ If you type:
       String[] out2messages;
     }
 
-`gwtasyncgen` will generate two classes, `SubmitUserAction` and `SubmitUserResult`. `SubmitUserAction` will have fields, getters, and a constructor (or two as needed for serialization) for `id` and `name`. `SubmitResultResult` will have the same for `success`, and `messages`. `equals` and `hashCode` are also correctly implemented if you need it for caching/etc. purposes.
+`gwt-mpv-apt` will generate two classes, `SubmitUserAction` and `SubmitUserResult`. `SubmitUserAction` will have fields, getters, and a constructor (or two as needed for serialization) for `id` and `name`. `SubmitResultResult` will have the same for `success`, and `messages`. `equals` and `hashCode` are also correctly implemented if you need it for caching/etc. purposes.
 
 All told, this is ~100 lines of boilerplate code generated from ~8 lines in the spec class.
 
 Notes:
 
 * You must end your class name in `Spec`--it will be stripped and replaced with `Action` and `Result`
-* The `1`/`2` numbers in the fields are optional, but Eclipse, due to a [bug](https://bugs.eclipse.org/bugs/show_bug.cgi?id=300408), will not return the fields in a deterministic order. `gwtasyncgen` will sort the fields alphabetically, so using the `in1`/`in2` convention will get deterministic ordering back.
-* You can configure where Eclipse/`javac` puts the generated source code, which GWT will need access to
+* The `1`/`2` numbers in the fields are optional, but Eclipse, due to a [bug](https://bugs.eclipse.org/bugs/show_bug.cgi?id=300408), will not return the fields in a deterministic order. `gwt-mpv-apt` will sort the fields alphabetically, so using the `in1`/`in2` convention will get deterministic ordering back.
+* You can configure where Eclipse/`javac` puts the generated source code, which the GWT compiler will need access to
+* If you want `gwt-dispatch` action and result classes to be used, use the annotation parameter `-AdispatchBasePackage=net.customware.gwt.dispatch.shared`
 
 `@GenEvent`
 -----------
@@ -53,7 +54,7 @@ If you type:
       boolean p2originator;
     }
 
-`gwtasyncgen` will generate two classes, `FooChangedEvent` and `FooChangedHandler`. `FooChangedEvent` will have fields, getters, and a constructor for `foo` and `originator`, plus static `getType()`, instance `dispatch`, etc., for it to function correctly as a `GwtEvent`. `FooChangedHandler` will be an interface with a `onFooChanged` method that takes a `FooChangedEvent` parameter.
+`gwt-mpv-apt` will generate two classes, `FooChangedEvent` and `FooChangedHandler`. `FooChangedEvent` will have fields, getters, and a constructor for `foo` and `originator`, plus static `getType()`, instance `dispatch`, etc., for it to function correctly as a `GwtEvent`. `FooChangedHandler` will be an interface with a `onFooChanged` method that takes a `FooChangedEvent` parameter.
 
 Notes:
 
