@@ -1,4 +1,4 @@
-package org.gwtasyncgen.processor;
+package org.gwtmpv.processor;
 
 public class InvalidTypeElementException extends Exception {
 

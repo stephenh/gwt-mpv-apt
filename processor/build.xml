@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="gwtasyncgen" default="jar" basedir=".">
+<project name="gwt-mpv-apt" default="jar" basedir=".">
 
 	<target name="clean">
 		<delete dir="bin"/>
@@ -8,7 +8,7 @@
 
 	<target name="annotations" depends="compile" description="jar only the annotations into the examples project">
 		<jar destfile="bin/annotations.jar">
-			<fileset dir="bin/main" includes="org/gwtasyncgen/*.class"/>
+			<fileset dir="bin/main" includes="org/gwtmpv/*.class"/>
 		</jar>
 		<copy file="bin/annotations.jar" todir="../examples/lib"/>
 	</target>
@@ -24,17 +24,16 @@
 
 	<target name="jar" depends="compile">
 		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar-1.0.jar"/>
-		<jarjar destfile="bin/gwtasyncgen.jar">
+		<jarjar destfile="bin/gwt-mpv-apt.jar">
 			<fileset dir="bin/main" includes="**/*.class"/>
 			<fileset dir="src" includes="**/*" excludes="**/*.class"/>
 			<zipfileset dir="META-INF" includes="**/*" prefix="META-INF"/>
 			<zipfileset src="lib/main/joist.util.jar"/>
-			<rule pattern="org.apache.**" result="org.gwtasyncgen.dependencies.org.apache.@1"/>
-			<rule pattern="joist.**" result="org.gwtasyncgen.dependencies.joist.@1"/>
+			<rule pattern="joist.**" result="org.gwtmpv.processor.deps.joist.@1"/>
 			<!-- include the super source for @Generated -->
 			<fileset dir="super" includes="**/*.java"/>
 		</jarjar>
-		<zip destfile="bin/gwtasyncgen.zip">
+		<zip destfile="bin/gwt-mpv-apt.zip">
 			<fileset dir="src" includes="**/*.java"/>
 		</zip>
 	</target>

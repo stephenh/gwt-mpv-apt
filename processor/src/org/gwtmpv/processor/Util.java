@@ -1,4 +1,4 @@
-package org.gwtasyncgen.processor;
+package org.gwtmpv.processor;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -96,18 +96,18 @@ public class Util {
 
 	public static void addHashCode(GClass gclass, List<Prop> properties) {
 		GMethod hashCode = gclass.getMethod("hashCode").addAnnotation("@Override").returnType("int");
-		hashCode.body.line("int result = 23;");
-		hashCode.body.line("result = (result * 37) + getClass().hashCode();");
+		hashCode.body.line("int hashCode = 23;");
+		hashCode.body.line("hashCode = (hashCode * 37) + getClass().hashCode();");
 		for (Prop p : properties) {
 			if (Primitives.isPrimitive(p.type)) {
-				hashCode.body.line("result = (result * 37) + new {}({}).hashCode();", Primitives.getWrapper(p.type), p.name);
+				hashCode.body.line("hashCode = (hashCode * 37) + new {}({}).hashCode();", Primitives.getWrapper(p.type), p.name);
 			} else if (p.type.endsWith("[]")) {
-				hashCode.body.line("result = (result * 37) + java.util.Arrays.deepHashCode({});", p.name);
+				hashCode.body.line("hashCode = (hashCode * 37) + java.util.Arrays.deepHashCode({});", p.name);
 			} else {
-				hashCode.body.line("result = (result * 37) + ({} == null ? 1 : {}.hashCode());", p.name, p.name);
+				hashCode.body.line("hashCode = (hashCode * 37) + ({} == null ? 1 : {}.hashCode());", p.name, p.name);
 			}
 		}
-		hashCode.body.line("return result;");
+		hashCode.body.line("return hashCode;");
 	}
 
 	public static void addToString(GClass gclass, List<Prop> properties) {

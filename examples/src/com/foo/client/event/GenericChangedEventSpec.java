@@ -1,6 +1,6 @@
 package com.foo.client.event;
 
-import org.gwtasyncgen.GenEvent;
+import org.gwtmpv.GenEvent;
 
 @GenEvent
 public class GenericChangedEventSpec<T> {

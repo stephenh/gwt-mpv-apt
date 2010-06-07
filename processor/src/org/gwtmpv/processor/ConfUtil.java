@@ -1,4 +1,4 @@
-package org.gwtasyncgen.processor;
+package org.gwtmpv.processor;
 
 import java.io.File;
 import java.io.FileInputStream;

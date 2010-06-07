@@ -1,4 +1,4 @@
-package org.gwtasyncgen.processor;
+package org.gwtmpv.processor;
 
 import java.util.List;
 
@@ -23,17 +23,22 @@ public class DispatchGenerator {
 			throw new InvalidTypeElementException();
 		}
 
+		String dispatchBasePackage = env.getOptions().get("dispatchBasePackage");
+		if (dispatchBasePackage == null) {
+			dispatchBasePackage = "org.gwtmpv.dispatch.shared";
+		}
+
 		this.env = env;
 		this.generics = new GenericSuffix(element);
 		String base = element.toString().replaceAll("Spec$", "");
 
 		this.actionClass = new GClass(base + "Action" + generics.varsWithBounds);
 		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
-		this.actionClass.implementsInterface("net.customware.gwt.dispatch.shared.Action<{}>", base + "Result" + generics.vars);
+		this.actionClass.implementsInterface("{}.Action<{}>", dispatchBasePackage, base + "Result" + generics.vars);
 
 		this.resultClass = new GClass(base + "Result" + generics.varsWithBounds);
 		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
-		this.resultClass.implementsInterface("net.customware.gwt.dispatch.shared.Result");
+		this.resultClass.implementsInterface("{}.Result", dispatchBasePackage);
 
 		Util.addGenerated(this.actionClass, DispatchGenerator.class);
 		Util.addGenerated(this.resultClass, DispatchGenerator.class);
