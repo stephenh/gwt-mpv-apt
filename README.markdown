@@ -91,6 +91,7 @@ Changelog
 
 * 1.1 - 2010-06-27
   * Add auto-detection of `gwt-dispatch` for `@GenDispatch`-generated DTOs
+  * Add ivy to `build.xml` for downloading jars and publishing to the [maven repo](http://repo.joist.ws/org/gwtmpv/gwt-mpv-apt/)
 * 1.0 - 2010-06-06
   * Project renamed from `gwtasyncgen` to `gwt-mpv-apt`
 
