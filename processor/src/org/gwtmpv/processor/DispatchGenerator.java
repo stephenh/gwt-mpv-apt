@@ -25,7 +25,13 @@ public class DispatchGenerator {
 
 		String dispatchBasePackage = env.getOptions().get("dispatchBasePackage");
 		if (dispatchBasePackage == null) {
-			dispatchBasePackage = "org.gwtmpv.dispatch.shared";
+			// Auto-detect gwt-dispatch
+			TypeElement gwtDispatchAction = env.getElementUtils().getTypeElement("net.customware.gwt.dispatch.shared.Action");
+			if (gwtDispatchAction != null) {
+				dispatchBasePackage = "net.customware.gwt.dispatch.shared";
+			} else {
+				dispatchBasePackage = "org.gwtmpv.dispatch.shared";
+			}
 		}
 
 		this.env = env;
