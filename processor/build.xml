@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="gwt-mpv-apt" default="jar" basedir=".">
+<project name="gwt-mpv-apt" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<target name="clean">
 		<delete dir="bin"/>
@@ -13,30 +13,59 @@
 		<copy file="bin/annotations.jar" todir="../examples/lib"/>
 	</target>
 
-	<target name="compile">
+	<target name="compile" depends="ivy-retrieve">
 		<mkdir dir="bin/main"/>
 		<javac srcdir="src" destdir="bin/main" debug="true" nowarn="yes" source="1.6" target="1.6" encoding="utf8">
 			<classpath>
-				<pathelement path="lib/main/joist.util.jar"/>
+				<pathelement path="bin/lib/build/jars/joist-util.jar"/>
 			</classpath>
 		</javac>
 	</target>
 
 	<target name="jar" depends="compile">
-		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar-1.0.jar"/>
-		<jarjar destfile="bin/gwt-mpv-apt.jar">
+		<mkdir dir="bin/jars"/>
+		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="bin/lib/build/jars/jarjar.jar"/>
+		<jarjar destfile="bin/jars/gwt-mpv-apt.jar">
 			<fileset dir="bin/main" includes="**/*.class"/>
 			<fileset dir="src" includes="**/*" excludes="**/*.class"/>
 			<zipfileset dir="META-INF" includes="**/*" prefix="META-INF"/>
-			<zipfileset src="lib/main/joist.util.jar"/>
+			<zipfileset src="bin/lib/build/jars/joist-util.jar"/>
 			<rule pattern="joist.**" result="org.gwtmpv.processor.deps.joist.@1"/>
 			<!-- include the super source for @Generated -->
 			<fileset dir="super" includes="**/*.java"/>
 		</jarjar>
-		<zip destfile="bin/gwt-mpv-apt.zip">
+		<mkdir dir="bin/sources"/>
+		<zip destfile="bin/sources/gwt-mpv-apt.jar">
 			<fileset dir="src" includes="**/*.java"/>
 		</zip>
 	</target>
+
+	<!-- start ivy targets -->
+	<property name="ivy.jar.version" value="2.1.0"/>
+	<property name="ivy.jar.name" value="ivy-${ivy.jar.version}.jar"/>
+	<property name="ivy.home" value="${user.home}/.ivy2"/>
+	<available property="ivy.installed" file="${ivy.home}/${ivy.jar.name}"/>
+
+	<target name="ivy-install" unless="ivy.installed">
+		<mkdir dir="${ivy.home}"/>
+		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.jar.version}/${ivy.jar.name}" dest="${ivy.home}/${ivy.jar.name}"/>
+	</target>
+
+	<target name="ivy-init" depends="ivy-install">
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${ivy.home}/${ivy.jar.name}"/>
+	</target>
+
+	<target name="ivy-retrieve" depends="ivy-init" description="downloads jars for the project">
+		<ivy:retrieve pattern="bin/lib/[conf]/[type]s/[artifact].[ext]" conf="*" type="*"/>
+	</target>
+
+	<target name="ivy-publish" depends="jar,ivy-init" description="publish jar/source to maven repo mounted at ~/repo">
+		<ivy:makepom ivyfile="ivy.xml" pomfile="bin/poms/${ivy.module}.pom"/>
+		<ivy:publish status="release" resolver="maven-share" update="true" overwrite="true" forcedeliver="true" publishivy="false">
+			<artifacts pattern="bin/[type]s/[artifact].[ext]" />
+		</ivy:publish>
+	</target>
+	<!-- end ivy targets -->
 
 </project>
 
