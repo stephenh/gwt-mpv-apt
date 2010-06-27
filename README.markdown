@@ -85,3 +85,11 @@ Todo
 * Default values in the spec
 * Mutable fields on the event, e.g. claimed
 
+Changelog
+=========
+
+* 1.1 - 2010-06-27
+  * Add auto-detection of `gwt-dispatch` for `@GenDispatch`-generated DTOs
+* 1.0 - 2010-06-06
+  * Project renamed from `gwtasyncgen` to `gwt-mpv-apt`
+
