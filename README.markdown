@@ -8,6 +8,10 @@ Annotation processors enable compiler-/IDE-driven generated-as-you-type code gen
 * `XxxAction/XxxResult` DTOs for [gwt-dispatch](http://code.google.com/p/gwt-dispatch/) as you change the `XxxSpec` class annotated with `@GenDispatch`
 * `XxxEvent/XxxHandler` events for GWT events as you change the `XxxEventSpec` class annotated with `@GenEvent`
 
+Also see these blog posts:
+
+* [gwt-mpv-apt-1.1](http://www.draconianoverlord.com/2010/06/28/gwt-mpv-apt-1.1.html)
+
 Install
 =======
 
