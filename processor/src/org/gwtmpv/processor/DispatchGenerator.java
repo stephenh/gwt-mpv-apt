@@ -10,6 +10,7 @@ import org.exigencecorp.aptutil.GenericSuffix;
 import org.exigencecorp.aptutil.Prop;
 import org.exigencecorp.aptutil.PropUtil;
 import org.exigencecorp.aptutil.Util;
+import org.gwtmpv.GenDispatch;
 
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
@@ -32,8 +33,11 @@ public class DispatchGenerator {
 		if (dispatchBasePackage == null) {
 			// Auto-detect gwt-dispatch
 			TypeElement gwtDispatchAction = env.getElementUtils().getTypeElement("net.customware.gwt.dispatch.shared.Action");
+			TypeElement gwtpAction = env.getElementUtils().getTypeElement("com.philbeaudoin.gwtp.dispatch.shared.Action");
 			if (gwtDispatchAction != null) {
 				dispatchBasePackage = "net.customware.gwt.dispatch.shared";
+			} else if (gwtpAction != null) {
+				dispatchBasePackage = "com.philbeaudoin.gwtp.dispatch.shared";
 			} else {
 				dispatchBasePackage = "org.gwtmpv.dispatch.shared";
 			}
@@ -45,11 +49,21 @@ public class DispatchGenerator {
 
 		this.actionClass = new GClass(base + "Action" + generics.varsWithBounds);
 		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
-		this.actionClass.implementsInterface("{}.Action<{}>", dispatchBasePackage, base + "Result" + generics.vars);
 
 		this.resultClass = new GClass(base + "Result" + generics.varsWithBounds);
 		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
-		this.resultClass.implementsInterface("{}.Result", dispatchBasePackage);
+
+		GenDispatch genDispatch = element.getAnnotation(GenDispatch.class);
+		if (genDispatch.baseAction() != null && genDispatch.baseAction().length() > 0) {
+			this.actionClass.baseClassName("{}<{}>", genDispatch.baseAction(), base + "Result" + generics.vars);
+		} else {
+			this.actionClass.implementsInterface("{}.Action<{}>", dispatchBasePackage, base + "Result" + generics.vars);
+		}
+		if (genDispatch.baseResult() != null && genDispatch.baseResult().length() > 0) {
+			this.resultClass.baseClassName(genDispatch.baseResult());
+		} else {
+			this.resultClass.implementsInterface("{}.Result", dispatchBasePackage);
+		}
 
 		PropUtil.addGenerated(this.actionClass, DispatchGenerator.class);
 		PropUtil.addGenerated(this.resultClass, DispatchGenerator.class);
