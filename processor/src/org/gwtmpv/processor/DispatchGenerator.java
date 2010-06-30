@@ -25,7 +25,7 @@ public class DispatchGenerator {
 
 	public DispatchGenerator(ProcessingEnvironment env, TypeElement element) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("Spec")) {
-			env.getMessager().printMessage(Kind.ERROR, "GenDispatch targets must end with a Spec suffix");
+			env.getMessager().printMessage(Kind.ERROR, "GenDispatch targets must end with a Spec suffix", element);
 			throw new InvalidTypeElementException();
 		}
 
