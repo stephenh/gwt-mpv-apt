@@ -82,6 +82,14 @@ IntelliJ
 
 Has mediocre/near-useless annotation processor support last I checked.
 
+Community
+=========
+
+For discussion or feedback, either:
+
+* Post on the [gwt-mpv-apt](http://groups.google.com/group/gwt-mpv-apt) mailing list
+* File bugs over in [issues](http://github.com/stephenh/gwt-mpv-apt/issues) if you come across them
+
 Todo
 ====
 
