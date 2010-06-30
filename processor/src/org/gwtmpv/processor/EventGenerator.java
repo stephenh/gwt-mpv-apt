@@ -9,6 +9,10 @@ import javax.tools.Diagnostic.Kind;
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
 
+import org.exigencecorp.aptutil.GenericSuffix;
+import org.exigencecorp.aptutil.Prop;
+import org.exigencecorp.aptutil.PropUtil;
+import org.exigencecorp.aptutil.Util;
 import org.gwtmpv.GenEvent;
 
 public class EventGenerator {
@@ -36,7 +40,7 @@ public class EventGenerator {
 		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
 			+ generics.vars);
 
-		properties = Util.getProperties(element, "p");
+		properties = PropUtil.getProperties(element, "p");
 	}
 
 	public void generate() {
@@ -44,10 +48,10 @@ public class EventGenerator {
 		generateType();
 		generateDispatch();
 		generateFields();
-		Util.addEquals(eventClass, generics, properties);
-		Util.addHashCode(eventClass, properties);
-		Util.addToString(eventClass, properties);
-		Util.addGenerated(eventClass, DispatchGenerator.class);
+		PropUtil.addEquals(eventClass, generics, properties);
+		PropUtil.addHashCode(eventClass, properties);
+		PropUtil.addToString(eventClass, properties);
+		PropUtil.addGenerated(eventClass, DispatchGenerator.class);
 		Util.saveCode(env, eventClass);
 	}
 
@@ -66,7 +70,7 @@ public class EventGenerator {
 		GMethod associatedType = eventClass.getMethod("getAssociatedType");
 		associatedType.returnType("Type<{}>", handlerName + generics.vars).addAnnotation("@Override");
 		if (generics.vars.length() > 0) {
-			associatedType.addAnnotation("@SuppressWarnings(\"unchecked\")");
+			associatedType.addAnnotation("@SuppressWarnings(\"all\")");
 			associatedType.body.line("return (Type) TYPE;");
 		} else {
 			associatedType.body.line("return TYPE;");
