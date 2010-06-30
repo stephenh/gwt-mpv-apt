@@ -93,6 +93,10 @@ Todo
 Changelog
 =========
 
+* 1.2 - 2010-06-30
+  * Add auto-detection of `gwt-platform`
+  * Add `@GenDispatch` `baseAction` and `baseResult` parameters
+  * Fix corrupted 1.1 release jar
 * 1.1 - 2010-06-27
   * Add auto-detection of `gwt-dispatch` for `@GenDispatch`-generated DTOs
   * Add ivy to `build.xml` for downloading jars and publishing to the [maven repo](http://repo.joist.ws/org/gwtmpv/gwt-mpv-apt/)
