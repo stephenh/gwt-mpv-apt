@@ -6,6 +6,11 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
 
+import org.exigencecorp.aptutil.GenericSuffix;
+import org.exigencecorp.aptutil.Prop;
+import org.exigencecorp.aptutil.PropUtil;
+import org.exigencecorp.aptutil.Util;
+
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
 
@@ -46,15 +51,15 @@ public class DispatchGenerator {
 		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
 		this.resultClass.implementsInterface("{}.Result", dispatchBasePackage);
 
-		Util.addGenerated(this.actionClass, DispatchGenerator.class);
-		Util.addGenerated(this.resultClass, DispatchGenerator.class);
+		PropUtil.addGenerated(this.actionClass, DispatchGenerator.class);
+		PropUtil.addGenerated(this.resultClass, DispatchGenerator.class);
 
 		this.element = element;
 	}
 
 	public void generate() {
-		generateDto(actionClass, Util.getProperties(element, "in"));
-		generateDto(resultClass, Util.getProperties(element, "out"));
+		generateDto(actionClass, PropUtil.getProperties(element, "in"));
+		generateDto(resultClass, PropUtil.getProperties(element, "out"));
 	}
 
 	private void generateDto(GClass gclass, List<Prop> properties) {
@@ -67,9 +72,9 @@ public class DispatchGenerator {
 			// re-add the default constructor for serialization
 			gclass.getConstructor().setProtected();
 		}
-		Util.addHashCode(gclass, properties);
-		Util.addEquals(gclass, generics, properties);
-		Util.addToString(gclass, properties);
+		PropUtil.addHashCode(gclass, properties);
+		PropUtil.addEquals(gclass, generics, properties);
+		PropUtil.addToString(gclass, properties);
 		Util.saveCode(env, gclass);
 	}
 

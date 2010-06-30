@@ -17,7 +17,7 @@
 		<mkdir dir="bin/main"/>
 		<javac srcdir="src" destdir="bin/main" debug="true" nowarn="yes" source="1.6" target="1.6" encoding="utf8">
 			<classpath>
-				<pathelement path="bin/lib/build/jars/joist-util.jar"/>
+				<fileset dir="bin/lib/build/jars" includes="*.jar"/>
 			</classpath>
 		</javac>
 	</target>
@@ -30,7 +30,9 @@
 			<fileset dir="src" includes="**/*" excludes="**/*.class"/>
 			<zipfileset dir="META-INF" includes="**/*" prefix="META-INF"/>
 			<zipfileset src="bin/lib/build/jars/joist-util.jar"/>
+			<zipfileset src="bin/lib/build/jars/apt-util.jar"/>
 			<rule pattern="joist.**" result="org.gwtmpv.processor.deps.joist.@1"/>
+			<rule pattern="org.exigencecorp.aptutil.**" result="org.gwtmpv.processor.deps.aptutil.@1"/>
 			<!-- include the super source for @Generated -->
 			<fileset dir="super" includes="**/*.java"/>
 		</jarjar>
