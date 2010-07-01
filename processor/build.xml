@@ -61,8 +61,14 @@
 		<ivy:retrieve pattern="bin/lib/[conf]/[type]s/[artifact].[ext]" conf="*" type="*"/>
 	</target>
 
-	<target name="ivy-publish" depends="jar,ivy-init" description="publish jar/source to maven repo mounted at ~/repo">
-		<ivy:makepom ivyfile="ivy.xml" pomfile="bin/poms/${ivy.module}.pom"/>
+	<target name="ivy-pom" depends="jar,ivy-init" description="publish jar/source to maven repo mounted at ~/repo">
+		<ivy:makepom ivyfile="ivy.xml" pomfile="bin/poms/${ant.project.name}.pom">
+			<mapping conf="default" scope="compile"/>
+			<mapping conf="build" scope="system"/>
+		</ivy:makepom>
+	</target>
+
+	<target name="ivy-publish" depends="jar,ivy-init,ivy-pom" description="publish jar/source to maven repo mounted at ~/repo">
 		<ivy:publish status="release" resolver="maven-share" update="true" overwrite="true" forcedeliver="true" publishivy="false">
 			<artifacts pattern="bin/[type]s/[artifact].[ext]" />
 		</ivy:publish>
