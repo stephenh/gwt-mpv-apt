@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.gwtmpv</groupId>
+  <artifactId>gwt-mpv-apt</artifactId>
+  <version>@version@</version>
+  <name>gwt-mpv-apt</name>
+  <packaging>jar</packaging>
+  <description>gwt-mpv-apt is a Java 6 annotation processor to help generate some of the boilerplate code involved in GWT projects.</description>
+  <url>http://github.com/stephenh/gwt-mpv-apt</url>
+  <licenses>
+  	<license>
+  		<name>Apache License 2.0</name>
+  		<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+  		<distribution>repo</distribution>
+  	</license>
+  </licenses>
+  <scm>
+  	<url>http://github.com/stephenh/gwt-mpv-apt</url>
+  	<connection>git://github.com/stephenh/gwt-mpv-apt.git</connection>
+  </scm>
+  <developers>
+  	<developer>
+  		<id>stephenh</id>
+  		<name>Stephen Haberman</name>
+  	</developer>
+  </developers>
+  <issueManagement>
+  	<system>GitHub</system>
+  	<url>http://github.com/stephenh/gwt-mpv-apt/issues</url>
+  </issueManagement>
+  <inceptionYear>2010</inceptionYear>
+  <mailingLists>
+  	<mailingList>
+  		<name>gwt-mpv-apt</name>
+  		<archive>http://groups.google.com/group/gwt-mpv-apt</archive>
+  		<post>http://groups.google.com/group/gwt-mpv-apt/post</post>
+  		<subscribe>http://groups.google.com/group/gwt-mpv-apt/subscribe</subscribe>
+  	</mailingList>
+  </mailingLists>
+</project>
