@@ -15,8 +15,9 @@
   	</license>
   </licenses>
   <scm>
-  	<url>http://github.com/stephenh/gwt-mpv-apt</url>
-  	<connection>git://github.com/stephenh/gwt-mpv-apt.git</connection>
+  	<connection>scm:git:git@github.com:stephenh/gwt-mpv-apt.git</connection>
+  	<developerConnection>scm:git:git@github.com:stephenh/gwt-mpv-apt.git</developerConnection>
+  	<url>git@github.com:stephenh/gwt-mpv-apt.git</url>
   </scm>
   <developers>
   	<developer>
