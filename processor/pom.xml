@@ -24,6 +24,10 @@
 			<id>stephenh</id>
 			<name>Stephen Haberman</name>
 		</developer>
+		<developer>
+			<id>rombert</id>
+			<name>Robert Munteanu</name>
+		</developer>
 	</developers>
 	<issueManagement>
 		<system>GitHub</system>
