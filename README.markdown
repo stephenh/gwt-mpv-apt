@@ -46,7 +46,7 @@ Notes:
 * You must end your class name in `Spec`--it will be stripped and replaced with `Action` and `Result`
 * The `1`/`2` numbers in the fields are optional, but Eclipse, due to a [bug](https://bugs.eclipse.org/bugs/show_bug.cgi?id=300408), will not return the fields in a deterministic order. `gwt-mpv-apt` will sort the fields alphabetically, so using the `in1`/`in2` convention will get deterministic ordering back.
 * You can configure where Eclipse/`javac` puts the generated source code, which the GWT compiler will need access to
-* If you want `gwt-dispatch` action and result classes to be used, use the annotation parameter `-AdispatchBasePackage=net.customware.gwt.dispatch.shared`
+* `gwt-mpv-apt` should auto-detect whether you are using `gwt-dispatch` or `gwt-platform` and use the respective `Action`/`Result` interfaces
 
 `@GenEvent`
 -----------
