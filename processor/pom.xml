@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.gwtmpv</groupId>
 	<artifactId>gwt-mpv-apt</artifactId>
-	<version>@version@</version>
+	<version>@revision@</version>
 	<name>gwt-mpv-apt</name>
 	<packaging>jar</packaging>
 	<description>gwt-mpv-apt is a Java 6 annotation processor to help generate some of the boilerplate code involved in GWT projects.</description>

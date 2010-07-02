@@ -60,9 +60,9 @@
 	<target name="ivy-retrieve" depends="ivy-init" description="downloads jars for the project">
 		<ivy:retrieve pattern="bin/lib/[conf]/[type]s/[artifact].[ext]" conf="*" type="*"/>
 	</target>
-	
+
 	<target name="gen-pom" description="generates the maven pom.xml from the template">
-		<filter token="version" value="${project.version}"/>
+		<filter token="revision" value="${revision}"/>
 		<copy file="pom.xml" tofile="bin/poms/${ant.project.name}.pom" filtering="true"/>
 	</target>
 
