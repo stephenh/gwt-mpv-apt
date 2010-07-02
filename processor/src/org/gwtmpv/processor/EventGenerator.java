@@ -27,7 +27,7 @@ public class EventGenerator {
 
 	public EventGenerator(ProcessingEnvironment env, TypeElement element, GenEvent eventSpec) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("EventSpec")) {
-			env.getMessager().printMessage(Kind.ERROR, "GenEvent target must end with a suffix EventSpec");
+			env.getMessager().printMessage(Kind.ERROR, "GenEvent target must end with a suffix EventSpec", element);
 			throw new InvalidTypeElementException();
 		}
 
