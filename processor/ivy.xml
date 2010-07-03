@@ -14,8 +14,8 @@
 	</publications>
 	<dependencies>
 		<!-- joist-util is jarjar'd so we count it as a build dependency. -->
-		<dependency org="org.exigencecorp" name="apt-util" rev="latest.integration" conf="build->default"/>
-		<dependency org="joist" name="joist-util" rev="2010063001" conf="build->default"/>
+		<dependency org="org.exigencecorp" name="apt-util" rev="latest.integration" conf="build->default,sources"/>
+		<dependency org="joist" name="joist-util" rev="2010063001" conf="build->default,sources"/>
 		<dependency org="com.tonicsystems" name="jarjar" rev="1.0" conf="build->default"/>
 	</dependencies>
 </ivy-module>
