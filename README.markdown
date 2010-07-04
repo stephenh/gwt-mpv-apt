@@ -11,6 +11,7 @@ Annotation processors enable compiler-/IDE-driven generated-as-you-type code gen
 Also see these blog posts:
 
 * [gwt-mpv-apt-1.1](http://www.draconianoverlord.com/2010/06/28/gwt-mpv-apt-1.1.html)
+* [Cutting down GWT verbosity](http://rombertw.wordpress.com/2010/07/03/cutting-down-gwts-verbosity-with-gwt-mpv-apt/)
 
 Install
 =======
