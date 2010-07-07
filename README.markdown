@@ -91,6 +91,11 @@ For discussion or feedback, either:
 * Post on the [gwt-mpv-apt](http://groups.google.com/group/gwt-mpv-apt) mailing list
 * File bugs over in [issues](http://github.com/stephenh/gwt-mpv-apt/issues) if you come across them
 
+Credits
+=======
+
+`gwt-mpv-apt` grew out of projects at [Bizo](http://www.bizo.com), a business demographics advertising company. Thanks to Bizo for their initial and continued support of the project.
+
 Todo
 ====
 
