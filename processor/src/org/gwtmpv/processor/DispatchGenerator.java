@@ -113,11 +113,11 @@ public class DispatchGenerator {
 			// Auto-detect gwt-dispatch
 			TypeElement gwtDispatchAction = env.getElementUtils().getTypeElement("net.customware.gwt.dispatch.shared.Action");
 			// Auto-detect gwt-platform
-			TypeElement gwtpAction = env.getElementUtils().getTypeElement("com.philbeaudoin.gwtp.dispatch.shared.Action");
+			TypeElement gwtpAction = env.getElementUtils().getTypeElement("com.gwtplatform.dispatch.shared.Action");
 			if (gwtDispatchAction != null) {
 				dispatchBasePackage = "net.customware.gwt.dispatch.shared";
 			} else if (gwtpAction != null) {
-				dispatchBasePackage = "com.philbeaudoin.gwtp.dispatch.shared";
+				dispatchBasePackage = "com.gwtplatform.dispatch.shared";
 			} else {
 				dispatchBasePackage = "org.gwtmpv.dispatch.shared";
 			}
