@@ -1,12 +1,16 @@
 package com.foo.client.dispatch.base;
 
 import org.gwtmpv.GenDispatch;
+import org.gwtmpv.In;
+import org.gwtmpv.Out;
 
 @GenDispatch(baseAction = BaseAction.NAME, baseResult = BaseResult.NAME)
 public class BaseFooSpec {
 
-	Integer inInteger;
-	String out1foo;
+	@In(1)
+	Integer integer;
+	@Out(1)
+	String foo;
 
 	// Shouldn't really put stuff here, but checking compile against base methods
 	public void foo() {

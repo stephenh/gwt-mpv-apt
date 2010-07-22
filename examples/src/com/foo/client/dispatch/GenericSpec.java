@@ -1,13 +1,20 @@
 package com.foo.client.dispatch;
 
 import org.gwtmpv.GenDispatch;
+import org.gwtmpv.In;
+import org.gwtmpv.Out;
 
 @GenDispatch
 public class GenericSpec<T, U extends Number> {
 
-	T in1t;
-	U in2u;
-	T out1t;
-	U out2u;
-	
+	@In(1)
+	T t;
+	@In(2)
+	U u;
+
+	@Out(1)
+	T t2;
+	@Out(2)
+	U u2;
+
 }

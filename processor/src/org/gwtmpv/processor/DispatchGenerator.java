@@ -1,19 +1,26 @@
 package org.gwtmpv.processor;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic.Kind;
+
+import joist.sourcegen.GClass;
+import joist.sourcegen.GMethod;
 
 import org.exigencecorp.aptutil.GenericSuffix;
 import org.exigencecorp.aptutil.Prop;
 import org.exigencecorp.aptutil.PropUtil;
 import org.exigencecorp.aptutil.Util;
 import org.gwtmpv.GenDispatch;
-
-import joist.sourcegen.GClass;
-import joist.sourcegen.GMethod;
+import org.gwtmpv.In;
+import org.gwtmpv.Out;
 
 public class DispatchGenerator {
 
@@ -29,23 +36,10 @@ public class DispatchGenerator {
 			throw new InvalidTypeElementException();
 		}
 
-		String dispatchBasePackage = env.getOptions().get("dispatchBasePackage");
-		if (dispatchBasePackage == null) {
-			// Auto-detect gwt-dispatch
-			TypeElement gwtDispatchAction = env.getElementUtils().getTypeElement("net.customware.gwt.dispatch.shared.Action");
-			TypeElement gwtpAction = env.getElementUtils().getTypeElement("com.philbeaudoin.gwtp.dispatch.shared.Action");
-			if (gwtDispatchAction != null) {
-				dispatchBasePackage = "net.customware.gwt.dispatch.shared";
-			} else if (gwtpAction != null) {
-				dispatchBasePackage = "com.philbeaudoin.gwtp.dispatch.shared";
-			} else {
-				dispatchBasePackage = "org.gwtmpv.dispatch.shared";
-			}
-		}
-
 		this.env = env;
 		this.generics = new GenericSuffix(element);
-		String base = element.toString().replaceAll("Spec$", "");
+		final String base = element.toString().replaceAll("Spec$", "");
+		final String dispatchBasePackage = detectDispatchBasePackage(env);
 
 		this.actionClass = new GClass(base + "Action" + generics.varsWithBounds);
 		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
@@ -72,8 +66,30 @@ public class DispatchGenerator {
 	}
 
 	public void generate() {
-		generateDto(actionClass, PropUtil.getProperties(element, "in"));
-		generateDto(resultClass, PropUtil.getProperties(element, "out"));
+		Map<Integer, VariableElement> in = new TreeMap<Integer, VariableElement>();
+		Map<Integer, VariableElement> out = new TreeMap<Integer, VariableElement>();
+		for (VariableElement field : ElementFilter.fieldsIn(element.getEnclosedElements())) {
+			In i = field.getAnnotation(In.class);
+			Out o = field.getAnnotation(Out.class);
+			if (i != null) {
+				if (in.containsKey(i.value())) {
+					env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " reuses an order value", field);
+				} else {
+					in.put(i.value(), field);
+				}
+			} else if (o != null) {
+				if (out.containsKey(o.value())) {
+					env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " reuses an order value", field);
+				} else {
+					out.put(o.value(), field);
+				}
+			} else {
+				env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " must be annotated with @In or @Out", field);
+			}
+		}
+
+		generateDto(actionClass, MpvUtil.toProperties(in.values()));
+		generateDto(resultClass, MpvUtil.toProperties(out.values()));
 	}
 
 	private void generateDto(GClass gclass, List<Prop> properties) {
@@ -90,6 +106,24 @@ public class DispatchGenerator {
 		PropUtil.addEquals(gclass, generics, properties);
 		PropUtil.addToString(gclass, properties);
 		Util.saveCode(env, gclass);
+	}
+
+	private String detectDispatchBasePackage(ProcessingEnvironment env) {
+		String dispatchBasePackage = env.getOptions().get("dispatchBasePackage");
+		if (dispatchBasePackage == null) {
+			// Auto-detect gwt-dispatch
+			TypeElement gwtDispatchAction = env.getElementUtils().getTypeElement("net.customware.gwt.dispatch.shared.Action");
+			// Auto-detect gwt-platform
+			TypeElement gwtpAction = env.getElementUtils().getTypeElement("com.philbeaudoin.gwtp.dispatch.shared.Action");
+			if (gwtDispatchAction != null) {
+				dispatchBasePackage = "net.customware.gwt.dispatch.shared";
+			} else if (gwtpAction != null) {
+				dispatchBasePackage = "com.philbeaudoin.gwtp.dispatch.shared";
+			} else {
+				dispatchBasePackage = "org.gwtmpv.dispatch.shared";
+			}
+		}
+		return dispatchBasePackage;
 	}
 
 	private void addFieldAndGetterAndConstructorArg(GClass gclass, GMethod cstr, String name, String type) {

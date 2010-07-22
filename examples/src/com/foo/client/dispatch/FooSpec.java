@@ -1,17 +1,22 @@
 package com.foo.client.dispatch;
 
 import org.gwtmpv.GenDispatch;
+import org.gwtmpv.In;
+import org.gwtmpv.Out;
 
 @GenDispatch
 public class FooSpec {
 
-	Integer inInteger;
-	String outFoo;
-	Integer outBar;
+	@In(1)
+	Integer integer;
+	@Out(1)
+	String foo;
+	@Out(2)
+	Integer bar;
 
 	// Shouldn't really put stuff here, but checking compile time order
 	public void foo() {
-		new FooResult(1, "2"); // alphabetical not expected
+		new FooResult("1", 2);
 	}
 
 }

@@ -1,0 +1,10 @@
+package org.gwtmpv;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+
+/** Marks the order of fields in {@link GenEvent} specs. */
+@Target({ ElementType.FIELD })
+public @interface Out {
+	int value();
+}

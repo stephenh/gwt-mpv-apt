@@ -1,9 +1,10 @@
 package com.foo.client.event;
 
 import org.gwtmpv.GenEvent;
+import org.gwtmpv.Param;
 
 @GenEvent(methodName = "onBarDone")
 public class BarChangedEventSpec {
-	Integer p1fooId;
+	@Param(1)
+	Integer fooId;
 }
-

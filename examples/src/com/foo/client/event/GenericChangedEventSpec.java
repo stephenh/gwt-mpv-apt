@@ -1,9 +1,10 @@
 package com.foo.client.event;
 
 import org.gwtmpv.GenEvent;
+import org.gwtmpv.Param;
 
 @GenEvent
 public class GenericChangedEventSpec<T> {
-	T p1t;
+	@Param(1)
+	T t;
 }
-
