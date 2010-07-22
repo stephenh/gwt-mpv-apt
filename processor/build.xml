@@ -2,7 +2,7 @@
 
 <project name="gwt-mpv-apt" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
-	<target name="clean">
+	<target name="clean" description="delete bin/*">
 		<delete dir="bin"/>
 	</target>
 
@@ -22,7 +22,7 @@
 		</javac>
 	</target>
 
-	<target name="jar" depends="compile">
+	<target name="jar" depends="compile" description="jarjars the processor and its dependencies">
 		<mkdir dir="bin/jars"/>
 		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="bin/lib/build/jars/jarjar.jar"/>
 		<jarjar destfile="bin/jars/gwt-mpv-apt.jar">
