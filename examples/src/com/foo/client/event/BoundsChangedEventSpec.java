@@ -1,10 +1,13 @@
 package com.foo.client.event;
 
 import org.gwtmpv.GenEvent;
+import org.gwtmpv.Param;
 
 @GenEvent
 public class BoundsChangedEventSpec<T extends Number, U extends Number> {
-	T p1t;
+	@Param(1)
+	T t;
+
+	@Param(2)
 	U p2u;
 }
-
