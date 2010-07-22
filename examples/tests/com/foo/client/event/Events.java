@@ -12,7 +12,7 @@ public class Events {
 		public void onFooChanged(FooChangedEvent event) {
 		}
 	}
-	
+
 	public static class Bar implements BarChangedHandler {
 		@Override
 		public void onBarDone(BarChangedEvent event) {
@@ -34,6 +34,10 @@ public class Events {
 
 		System.out.println(new BarChangedEvent(1).equals(new BarChangedEvent(1)));
 		System.out.println(new BarChangedEvent(1).equals(new BarChangedEvent(2)));
+
+		HandlerManager bus = new HandlerManager(null);
+		BarChangedEvent.fire(bus, 1);
+		BoundsChangedEvent.fire(bus, 1, 2);
 
 		t.fireEvent(new GenericChangedEvent<String>("foo"));
 		// t.fireEvent(new GenericChangedEvent<Integer>(1));
