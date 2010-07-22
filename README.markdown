@@ -113,6 +113,8 @@ Todo
 Changelog
 =========
 
+* 1.5 - 2010-07-22
+  * Update for gwt-platform 0.3 package name change
 * 1.4 - 2010-07-22
   * Add `@In`/`@Out` field annotations for `@GenDispatch`
   * Add `@Param` field annotation for `@GenEvent`
