@@ -31,11 +31,15 @@ If you type:
 
     @GenDispatch
     public class SubmitUserSpec {
-      Integer in1id;
-      String in2name;
+      @In(1)
+      Integer id;
+      @In(2)
+      String name;
 
-      boolean out1success;
-      String[] out2messages;
+      @Out(1)
+      boolean success;
+      @Out(2)
+      String[] messages;
     }
 
 `gwt-mpv-apt` will generate two classes, `SubmitUserAction` and `SubmitUserResult`. `SubmitUserAction` will have fields, getters, and a constructor (or two as needed for serialization) for `id` and `name`. `SubmitResultResult` will have the same for `success`, and `messages`. `equals` and `hashCode` are also correctly implemented if you need it for caching/etc. purposes.
@@ -45,7 +49,7 @@ All told, this is ~100 lines of boilerplate code generated from ~8 lines in the 
 Notes:
 
 * You must end your class name in `Spec`--it will be stripped and replaced with `Action` and `Result`
-* The `1`/`2` numbers in the fields are optional, but Eclipse, due to a [bug](https://bugs.eclipse.org/bugs/show_bug.cgi?id=300408), will not return the fields in a deterministic order. `gwt-mpv-apt` will sort the fields alphabetically, so using the `in1`/`in2` convention will get deterministic ordering back.
+* The `@In(1)`/`@In(2)` annotations are required for deterministic ordering due to an Eclipse [bug](https://bugs.eclipse.org/bugs/show_bug.cgi?id=300408)
 * You can configure where Eclipse/`javac` puts the generated source code, which the GWT compiler will need access to
 * `gwt-mpv-apt` should auto-detect whether you are using `gwt-dispatch` or `gwt-platform` and use the respective `Action`/`Result` interfaces
 
@@ -56,8 +60,10 @@ If you type:
 
     @GenEvent
     public class FooChangedEventSpec {
-      Foo p1foo;
-      boolean p2originator;
+      @Param(1)
+      Foo foo;
+      @Param(2)
+      boolean originator;
     }
 
 `gwt-mpv-apt` will generate two classes, `FooChangedEvent` and `FooChangedHandler`. `FooChangedEvent` will have fields, getters, and a constructor for `foo` and `originator`, plus static `getType()`, instance `dispatch`, etc., for it to function correctly as a `GwtEvent`. `FooChangedHandler` will be an interface with a `onFooChanged` method that takes a `FooChangedEvent` parameter.
@@ -65,7 +71,7 @@ If you type:
 Notes:
 
 * You must end your class name in `EventSpec`--it will be stripped and replaced with `Event` and `Handler`
-* Per `@GenDispatch`, the `p1`/`p2` prefixes are to enforce deterministic ordering
+* Per `@GenDispatch`, the `@Param(1)`/`@Param(2)` annotations are to enforce deterministic ordering
 * Per `@GenDispatch`, you can configure where Eclipse/`javac` puts the generated source code, which GWT will need access to
 
 Caveats
@@ -99,7 +105,7 @@ Credits
 Todo
 ====
 
-* Handle base classes
+* Handle base classes (done for `@GenDispatch`)
 * Builder/fluent methods?
 * Default values in the spec
 * Mutable fields on the event, e.g. claimed
@@ -107,6 +113,9 @@ Todo
 Changelog
 =========
 
+* 1.4 - 2010-07-22
+  * Add `@In`/`@Out` field annotations for `@GenDispatch`
+  * Add `@Param` field annotation for `@GenEvent`
 * 1.3 - 2010-07-02
   * Fix error reporting so it shows up in Eclipse Problems view (Robert Munteanu)
   * Use a new pom that does not include the jarjar'd dependencies (Robert Munteanu)
