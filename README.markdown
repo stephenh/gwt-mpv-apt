@@ -7,6 +7,7 @@ Annotation processors enable compiler-/IDE-driven generated-as-you-type code gen
 
 * `XxxAction/XxxResult` DTOs for [gwt-dispatch](http://code.google.com/p/gwt-dispatch/) as you change the `XxxSpec` class annotated with `@GenDispatch`
 * `XxxEvent/XxxHandler` events for GWT events as you change the `XxxEventSpec` class annotated with `@GenEvent`
+* `XxxPlace` classes for [gwt-mpv](http://www.gwtmpv.org) places
 
 Also see these blog posts:
 
@@ -113,6 +114,8 @@ Todo
 Changelog
 =========
 
+* 1.7 - 2010-09-14
+  * Add `@GenPlace` annotation for generating gwt-mpv places
 * 1.6 - 2010-07-22
   * Add static `XxxEvent.fire` method for `@GenEvent` events
 * 1.5 - 2010-07-22

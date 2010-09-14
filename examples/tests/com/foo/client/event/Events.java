@@ -1,5 +1,8 @@
 package com.foo.client.event;
 
+import org.gwtmpv.bus.DefaultEventBus;
+import org.gwtmpv.bus.EventBus;
+
 import com.foo.client.event.BarChangedEvent.BarChangedHandler;
 import com.foo.client.event.FooChangedEvent.FooChangedHandler;
 import com.foo.client.event.GenericChangedEvent.GenericChangedHandler;
@@ -35,7 +38,8 @@ public class Events {
 		System.out.println(new BarChangedEvent(1).equals(new BarChangedEvent(1)));
 		System.out.println(new BarChangedEvent(1).equals(new BarChangedEvent(2)));
 
-		HandlerManager bus = new HandlerManager(null);
+		// HandlerManager bus = new HandlerManager(null);
+		EventBus bus = new DefaultEventBus();
 		BarChangedEvent.fire(bus, 1);
 		BoundsChangedEvent.fire(bus, 1, 2);
 
