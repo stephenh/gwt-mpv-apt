@@ -104,6 +104,9 @@ public class PlaceGenerator {
 		GMethod m = p.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
 		m.body.line("GWT.runAsync(new RunAsyncCallback() {");
 		m.body.line("    public void onSuccess() {");
+		m.body.line("        if (request == null) {");
+		m.body.line("            return; // prefetching");
+		m.body.line("        }");
 		m.body.line("        {}.{}({});", getPresenterClassName(), getMethodName(), Join.commaSpace(getMethodParamNames()));
 		m.body.line("    }");
 		m.body.line("");
@@ -116,6 +119,9 @@ public class PlaceGenerator {
 
 	private void addSyncHandleRequest() {
 		GMethod m = p.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
+		m.body.line("if (request == null) {");
+		m.body.line("    return; // prefetching (not needed, just for consistency)");
+		m.body.line("}");
 		m.body.line("{}.{}({});", getPresenterClassName(), getMethodName(), Join.commaSpace(getMethodParamNames()));
 	}
 
