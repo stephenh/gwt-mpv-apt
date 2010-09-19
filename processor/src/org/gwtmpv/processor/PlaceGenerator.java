@@ -68,7 +68,13 @@ public class PlaceGenerator {
 		} else {
 			addSyncHandleRequest();
 		}
+		addStaticNewRequest();
 		Util.saveCode(env, p, element);
+	}
+
+	private void addStaticNewRequest() {
+		GMethod m = p.getMethod("newRequest").setStatic().returnType("org.gwtmpv.place.PlaceRequest");
+		m.body.line("return new PlaceRequest(\"{}\");", place.value());
 	}
 
 	private void addCstrSuperCall(GMethod cstr) {
@@ -101,22 +107,28 @@ public class PlaceGenerator {
 	}
 
 	private void addAsyncHandleRequest() {
-		GMethod handleRequest = p.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
-		handleRequest.body.line("GWT.runAsync(new RunAsyncCallback() {");
-		handleRequest.body.line("    public void onSuccess() {");
-		handleRequest.body.line("        {}.{}({});", getPresenterClassName(), getMethodName(), Join.commaSpace(getMethodParamNames()));
-		handleRequest.body.line("    }");
-		handleRequest.body.line("");
-		handleRequest.body.line("    public void onFailure(Throwable caught) {");
-		handleRequest.body.line("        failureCallback.onFailure(caught);");
-		handleRequest.body.line("    }");
-		handleRequest.body.line("});");
+		GMethod m = p.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
+		m.body.line("GWT.runAsync(new RunAsyncCallback() {");
+		m.body.line("    public void onSuccess() {");
+		m.body.line("        if (request == null) {");
+		m.body.line("            return; // prefetching");
+		m.body.line("        }");
+		m.body.line("        {}.{}({});", getPresenterClassName(), getMethodName(), Join.commaSpace(getMethodParamNames()));
+		m.body.line("    }");
+		m.body.line("");
+		m.body.line("    public void onFailure(Throwable caught) {");
+		m.body.line("        failureCallback.onFailure(caught);");
+		m.body.line("    }");
+		m.body.line("});");
 		p.addImports("com.google.gwt.core.client.GWT", "com.google.gwt.core.client.RunAsyncCallback");
 	}
 
 	private void addSyncHandleRequest() {
-		GMethod handleRequest = p.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
-		handleRequest.body.line("{}.{}({});", getPresenterClassName(), getMethodName(), Join.commaSpace(getMethodParamNames()));
+		GMethod m = p.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
+		m.body.line("if (request == null) {");
+		m.body.line("    return; // prefetching (not needed, just for consistency)");
+		m.body.line("}");
+		m.body.line("{}.{}({});", getPresenterClassName(), getMethodName(), Join.commaSpace(getMethodParamNames()));
 	}
 
 	private List<String> getMethodParamNames() {
