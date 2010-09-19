@@ -68,7 +68,13 @@ public class PlaceGenerator {
 		} else {
 			addSyncHandleRequest();
 		}
+		addStaticNewRequest();
 		Util.saveCode(env, p, element);
+	}
+
+	private void addStaticNewRequest() {
+		GMethod m = p.getMethod("newRequest").setStatic().returnType("org.gwtmpv.place.PlaceRequest");
+		m.body.line("return new PlaceRequest(\"{}\");", place.value());
 	}
 
 	private void addCstrSuperCall(GMethod cstr) {

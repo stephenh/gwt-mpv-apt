@@ -9,10 +9,14 @@ public class BarPresenter {
 	@GenPlace("bar")
 	public static void onRequest(PlaceRequest request) {
 	}
-	
+
 	public static void test() {
 		FailureCallback failureCallback = null;
 		new BarPlace(failureCallback); // request isn't put into the cstr
+
+		// would be nice to have strongly-typed with methods
+		@SuppressWarnings("unused")
+		PlaceRequest r = BarPlace.newRequest().with("somename", "somevalue");
 	}
 
 }
