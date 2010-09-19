@@ -114,6 +114,8 @@ Todo
 Changelog
 =========
 
+* 1.8 - 2010-09-1
+  * Add `newRequest` static method to generated places
 * 1.7 - 2010-09-14
   * Add `@GenPlace` annotation for generating gwt-mpv places
 * 1.6 - 2010-07-22
