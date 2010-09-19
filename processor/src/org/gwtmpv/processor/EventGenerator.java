@@ -1,5 +1,7 @@
 package org.gwtmpv.processor;
 
+import static joist.sourcegen.Argument.arg;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -106,17 +108,19 @@ public class EventGenerator {
 	}
 
 	private void generateFire() {
-		GMethod fire = eventClass.getMethod("fire").setStatic();
-		if (generics.varsWithBounds.length() > 0) {
-			fire.typeParameters(generics.varsWithBounds.substring(1, generics.varsWithBounds.length() - 1)); // ugly
+		// add one fire method for each available event bus
+		for (String bus : detectEventBuses(env)) {
+			GMethod fire = eventClass.getMethod("fire", arg(bus, "eventBus")).setStatic();
+			if (generics.varsWithBounds.length() > 0) {
+				fire.typeParameters(generics.varsWithBounds.substring(1, generics.varsWithBounds.length() - 1)); // ugly
+			}
+			List<String> args = new ArrayList<String>();
+			for (Prop p : properties) {
+				fire.argument(p.type, p.name);
+				args.add(p.name);
+			}
+			fire.body.line("eventBus.fireEvent(new {}({}));", eventClass.getSimpleClassNameWithoutGeneric() + generics.vars, Join.commaSpace(args));
 		}
-		fire.argument(detectEventBus(env), "eventBus");
-		List<String> args = new ArrayList<String>();
-		for (Prop p : properties) {
-			fire.argument(p.type, p.name);
-			args.add(p.name);
-		}
-		fire.body.line("eventBus.fireEvent(new {}({}));", eventClass.getSimpleClassNameWithoutGeneric() + generics.vars, Join.commaSpace(args));
 	}
 
 	private String getMethodName() {
@@ -127,18 +131,20 @@ public class EventGenerator {
 		}
 	}
 
-	private String detectEventBus(ProcessingEnvironment env) {
-		String eventBusOption = env.getOptions().get("eventBus");
-		if (eventBusOption != null) {
-			return eventBusOption;
-		}
-		for (String option : Copy.list("net.customware.gwt.presenter.client.EventBus", "com.gwtplatform.mvp.client.EventBus", "org.gwtmpv.bus.EventBus")) {
+	private List<String> detectEventBuses(ProcessingEnvironment env) {
+		List<String> available = new ArrayList<String>();
+		available.add("com.google.gwt.event.shared.HandlerManager");
+		for (String option : Copy.list(
+			"net.customware.gwt.presenter.client.EventBus",
+			"com.gwtplatform.mvp.client.EventBus",
+			"org.gwtmpv.bus.EventBus",
+			"com.google.gwt.event.shared.EventBus")) {
 			TypeElement t = env.getElementUtils().getTypeElement(option);
 			if (t != null) {
-				return t.toString();
+				available.add(option);
 			}
 		}
-		return "com.google.gwt.event.shared.HandlerManager";
+		return available;
 	}
 
 	private Collection<VariableElement> findParamsInOrder() {

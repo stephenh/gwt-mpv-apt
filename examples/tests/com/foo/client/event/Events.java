@@ -38,7 +38,10 @@ public class Events {
 		System.out.println(new BarChangedEvent(1).equals(new BarChangedEvent(1)));
 		System.out.println(new BarChangedEvent(1).equals(new BarChangedEvent(2)));
 
-		// HandlerManager bus = new HandlerManager(null);
+		HandlerManager manager = new HandlerManager(null);
+		BarChangedEvent.fire(manager, 1);
+		BoundsChangedEvent.fire(manager, 1, 2);
+
 		EventBus bus = new DefaultEventBus();
 		BarChangedEvent.fire(bus, 1);
 		BoundsChangedEvent.fire(bus, 1, 2);
