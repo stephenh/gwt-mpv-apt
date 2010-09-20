@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
@@ -31,7 +32,7 @@ public class DispatchGenerator {
 	private final Map<Integer, VariableElement> inParams = new TreeMap<Integer, VariableElement>();
 	private final Map<Integer, VariableElement> outParams = new TreeMap<Integer, VariableElement>();
 	private final String simpleName;
-	private final String packageName;
+	private final String dispatchPackageName;
 
 	public DispatchGenerator(ProcessingEnvironment env, TypeElement element) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("Spec")) {
@@ -43,7 +44,7 @@ public class DispatchGenerator {
 		this.element = element;
 		this.generics = new GenericSuffix(element);
 		simpleName = element.toString().replaceAll("Spec$", "");
-		packageName = detectDispatchBasePackage(env);
+		dispatchPackageName = detectDispatchBasePackage(env);
 
 		this.actionClass = new GClass(simpleName + "Action" + generics.varsWithBounds);
 		this.resultClass = new GClass(simpleName + "Result" + generics.varsWithBounds);
@@ -56,6 +57,22 @@ public class DispatchGenerator {
 		addAnnotatedInAndOutParams();
 		generateDto(actionClass, MpvUtil.toProperties(inParams.values()));
 		generateDto(resultClass, MpvUtil.toProperties(outParams.values()));
+		makeUiCommandIfOnClasspath();
+	}
+
+	private void makeUiCommandIfOnClasspath() {
+		if (env.getElementUtils().getTypeElement("org.gwtmpv.model.commands.DispatchUiCommand") == null) {
+			return;
+		}
+		if (!dispatchPackageName.contains("org.gwtmpv")) {
+			return;
+		}
+		GClass command = new GClass(simpleName + "Command" + generics.varsWithBounds);
+		command.setAbstract().baseClassName("org.gwtmpv.model.commands.DispatchUiCommand<{}Action{}, {}Result{}>", simpleName, generics.vars, simpleName, generics.vars);
+		GMethod cstr= command.getConstructor().argument("org.gwtmpv.dispatch.client.util.OutstandingDispatchAsync", "async");
+		cstr.body.line("super(async);");
+		PropUtil.addGenerated(command, DispatchGenerator.class);
+		Util.saveCode(env, command);
 	}
 
 	private void addSerialVersionUID() {
@@ -98,7 +115,7 @@ public class DispatchGenerator {
 		if (genDispatch.baseAction() != null && genDispatch.baseAction().length() > 0) {
 			this.actionClass.baseClassName("{}<{}>", genDispatch.baseAction(), simpleName + "Result" + generics.vars);
 		} else {
-			this.actionClass.implementsInterface("{}.Action<{}>", packageName, simpleName + "Result" + generics.vars);
+			this.actionClass.implementsInterface("{}.Action<{}>", dispatchPackageName, simpleName + "Result" + generics.vars);
 		}
 	}
 
@@ -107,7 +124,7 @@ public class DispatchGenerator {
 		if (genDispatch.baseResult() != null && genDispatch.baseResult().length() > 0) {
 			this.resultClass.baseClassName(genDispatch.baseResult());
 		} else {
-			this.resultClass.implementsInterface("{}.Result", packageName);
+			this.resultClass.implementsInterface("{}.Result", dispatchPackageName);
 		}
 	}
 
@@ -133,17 +150,16 @@ public class DispatchGenerator {
 		if (dispatchBasePackage != null) {
 			return dispatchBasePackage;
 		}
-		// Auto-detect gwt-dispatch
-		TypeElement gwtDispatchAction = env.getElementUtils().getTypeElement("net.customware.gwt.dispatch.shared.Action");
-		// Auto-detect gwt-platform
-		TypeElement gwtpAction = env.getElementUtils().getTypeElement("com.gwtplatform.dispatch.shared.Action");
-		if (gwtDispatchAction != null) {
-			return "net.customware.gwt.dispatch.shared";
-		} else if (gwtpAction != null) {
-			return "com.gwtplatform.dispatch.shared";
-		} else {
-			return "org.gwtmpv.dispatch.shared";
+		for (String option : new String[] {
+			"org.gwtmpv.dispatch.shared.Action",
+			"net.customware.gwt.dispatch.shared.Action",
+			"com.gwtplatform.dispatch.shared.Action" }) {
+			TypeElement t = env.getElementUtils().getTypeElement(option);
+			if (t != null) {
+				return ((PackageElement) t.getEnclosingElement()).getQualifiedName().toString();
+			}
 		}
+		return "org.gwtmpv.dispatch.shared";
 	}
 
 	private void addFieldAndGetterAndConstructorArg(GClass gclass, GMethod cstr, String name, String type) {
