@@ -30,6 +30,8 @@ public class DispatchGenerator {
 	private final GenericSuffix generics;
 	private final Map<Integer, VariableElement> inParams = new TreeMap<Integer, VariableElement>();
 	private final Map<Integer, VariableElement> outParams = new TreeMap<Integer, VariableElement>();
+	private final String base;
+	private final String dispatchBasePackage;
 
 	public DispatchGenerator(ProcessingEnvironment env, TypeElement element) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("Spec")) {
@@ -39,26 +41,17 @@ public class DispatchGenerator {
 
 		this.env = env;
 		this.generics = new GenericSuffix(element);
-		final String base = element.toString().replaceAll("Spec$", "");
-		final String dispatchBasePackage = detectDispatchBasePackage(env);
+		base = element.toString().replaceAll("Spec$", "");
+		dispatchBasePackage = detectDispatchBasePackage(env);
 
 		this.actionClass = new GClass(base + "Action" + generics.varsWithBounds);
-		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
-
 		this.resultClass = new GClass(base + "Result" + generics.varsWithBounds);
+
+		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
 		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
 
-		GenDispatch genDispatch = element.getAnnotation(GenDispatch.class);
-		if (genDispatch.baseAction() != null && genDispatch.baseAction().length() > 0) {
-			this.actionClass.baseClassName("{}<{}>", genDispatch.baseAction(), base + "Result" + generics.vars);
-		} else {
-			this.actionClass.implementsInterface("{}.Action<{}>", dispatchBasePackage, base + "Result" + generics.vars);
-		}
-		if (genDispatch.baseResult() != null && genDispatch.baseResult().length() > 0) {
-			this.resultClass.baseClassName(genDispatch.baseResult());
-		} else {
-			this.resultClass.implementsInterface("{}.Result", dispatchBasePackage);
-		}
+		setResultBaseClassOrInterface();
+		setActionBaseClassOrInterface();
 
 		PropUtil.addGenerated(this.actionClass, DispatchGenerator.class);
 		PropUtil.addGenerated(this.resultClass, DispatchGenerator.class);
@@ -95,6 +88,24 @@ public class DispatchGenerator {
 			env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " reuses an order value", field);
 		} else {
 			outParams.put(out.value(), field);
+		}
+	}
+
+	private void setActionBaseClassOrInterface() {
+		GenDispatch genDispatch = element.getAnnotation(GenDispatch.class);
+		if (genDispatch.baseAction() != null && genDispatch.baseAction().length() > 0) {
+			this.actionClass.baseClassName("{}<{}>", genDispatch.baseAction(), base + "Result" + generics.vars);
+		} else {
+			this.actionClass.implementsInterface("{}.Action<{}>", dispatchBasePackage, base + "Result" + generics.vars);
+		}
+	}
+
+	private void setResultBaseClassOrInterface() {
+		GenDispatch genDispatch = element.getAnnotation(GenDispatch.class);
+		if (genDispatch.baseResult() != null && genDispatch.baseResult().length() > 0) {
+			this.resultClass.baseClassName(genDispatch.baseResult());
+		} else {
+			this.resultClass.implementsInterface("{}.Result", dispatchBasePackage);
 		}
 	}
 
