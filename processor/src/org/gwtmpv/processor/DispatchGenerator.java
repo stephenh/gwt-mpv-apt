@@ -30,8 +30,8 @@ public class DispatchGenerator {
 	private final GenericSuffix generics;
 	private final Map<Integer, VariableElement> inParams = new TreeMap<Integer, VariableElement>();
 	private final Map<Integer, VariableElement> outParams = new TreeMap<Integer, VariableElement>();
-	private final String base;
-	private final String dispatchBasePackage;
+	private final String simpleName;
+	private final String packageName;
 
 	public DispatchGenerator(ProcessingEnvironment env, TypeElement element) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("Spec")) {
@@ -40,26 +40,30 @@ public class DispatchGenerator {
 		}
 
 		this.env = env;
-		this.generics = new GenericSuffix(element);
-		base = element.toString().replaceAll("Spec$", "");
-		dispatchBasePackage = detectDispatchBasePackage(env);
-
-		this.actionClass = new GClass(base + "Action" + generics.varsWithBounds);
-		this.resultClass = new GClass(base + "Result" + generics.varsWithBounds);
-
-		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
-		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
-
-		setResultBaseClassOrInterface();
-		setActionBaseClassOrInterface();
-
-		PropUtil.addGenerated(this.actionClass, DispatchGenerator.class);
-		PropUtil.addGenerated(this.resultClass, DispatchGenerator.class);
-
 		this.element = element;
+		this.generics = new GenericSuffix(element);
+		simpleName = element.toString().replaceAll("Spec$", "");
+		packageName = detectDispatchBasePackage(env);
+
+		this.actionClass = new GClass(simpleName + "Action" + generics.varsWithBounds);
+		this.resultClass = new GClass(simpleName + "Result" + generics.varsWithBounds);
 	}
 
 	public void generate() {
+		setResultBaseClassOrInterface();
+		setActionBaseClassOrInterface();
+		addSerialVersionUID();
+		addAnnotatedInAndOutParams();
+		generateDto(actionClass, MpvUtil.toProperties(inParams.values()));
+		generateDto(resultClass, MpvUtil.toProperties(outParams.values()));
+	}
+
+	private void addSerialVersionUID() {
+		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
+		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
+	}
+
+	private void addAnnotatedInAndOutParams() {
 		for (VariableElement field : ElementFilter.fieldsIn(element.getEnclosedElements())) {
 			In in = field.getAnnotation(In.class);
 			Out out = field.getAnnotation(Out.class);
@@ -71,8 +75,6 @@ public class DispatchGenerator {
 				env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " must be annotated with @In or @Out", field);
 			}
 		}
-		generateDto(actionClass, MpvUtil.toProperties(inParams.values()));
-		generateDto(resultClass, MpvUtil.toProperties(outParams.values()));
 	}
 
 	private void addInParam(VariableElement field, In in) {
@@ -94,9 +96,9 @@ public class DispatchGenerator {
 	private void setActionBaseClassOrInterface() {
 		GenDispatch genDispatch = element.getAnnotation(GenDispatch.class);
 		if (genDispatch.baseAction() != null && genDispatch.baseAction().length() > 0) {
-			this.actionClass.baseClassName("{}<{}>", genDispatch.baseAction(), base + "Result" + generics.vars);
+			this.actionClass.baseClassName("{}<{}>", genDispatch.baseAction(), simpleName + "Result" + generics.vars);
 		} else {
-			this.actionClass.implementsInterface("{}.Action<{}>", dispatchBasePackage, base + "Result" + generics.vars);
+			this.actionClass.implementsInterface("{}.Action<{}>", packageName, simpleName + "Result" + generics.vars);
 		}
 	}
 
@@ -105,11 +107,12 @@ public class DispatchGenerator {
 		if (genDispatch.baseResult() != null && genDispatch.baseResult().length() > 0) {
 			this.resultClass.baseClassName(genDispatch.baseResult());
 		} else {
-			this.resultClass.implementsInterface("{}.Result", dispatchBasePackage);
+			this.resultClass.implementsInterface("{}.Result", packageName);
 		}
 	}
 
 	private void generateDto(GClass gclass, List<Prop> properties) {
+		PropUtil.addGenerated(gclass, DispatchGenerator.class);
 		// move to GClass as a utility method
 		GMethod cstr = gclass.getConstructor();
 		for (Prop p : properties) {
