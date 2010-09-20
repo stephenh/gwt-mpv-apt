@@ -28,6 +28,8 @@ public class DispatchGenerator {
 	private final GClass actionClass;
 	private final GClass resultClass;
 	private final GenericSuffix generics;
+	private final Map<Integer, VariableElement> inParams = new TreeMap<Integer, VariableElement>();
+	private final Map<Integer, VariableElement> outParams = new TreeMap<Integer, VariableElement>();
 
 	public DispatchGenerator(ProcessingEnvironment env, TypeElement element) throws InvalidTypeElementException {
 		if (!element.toString().endsWith("Spec")) {
@@ -65,30 +67,35 @@ public class DispatchGenerator {
 	}
 
 	public void generate() {
-		Map<Integer, VariableElement> in = new TreeMap<Integer, VariableElement>();
-		Map<Integer, VariableElement> out = new TreeMap<Integer, VariableElement>();
 		for (VariableElement field : ElementFilter.fieldsIn(element.getEnclosedElements())) {
-			In i = field.getAnnotation(In.class);
-			Out o = field.getAnnotation(Out.class);
-			if (i != null) {
-				if (in.containsKey(i.value())) {
-					env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " reuses an order value", field);
-				} else {
-					in.put(i.value(), field);
-				}
-			} else if (o != null) {
-				if (out.containsKey(o.value())) {
-					env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " reuses an order value", field);
-				} else {
-					out.put(o.value(), field);
-				}
+			In in = field.getAnnotation(In.class);
+			Out out = field.getAnnotation(Out.class);
+			if (in != null) {
+				addInParam(field, in);
+			} else if (out != null) {
+				addOutParam(field, out);
 			} else {
 				env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " must be annotated with @In or @Out", field);
 			}
 		}
+		generateDto(actionClass, MpvUtil.toProperties(inParams.values()));
+		generateDto(resultClass, MpvUtil.toProperties(outParams.values()));
+	}
 
-		generateDto(actionClass, MpvUtil.toProperties(in.values()));
-		generateDto(resultClass, MpvUtil.toProperties(out.values()));
+	private void addInParam(VariableElement field, In in) {
+		if (inParams.containsKey(in.value())) {
+			env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " reuses an order value", field);
+		} else {
+			inParams.put(in.value(), field);
+		}
+	}
+
+	private void addOutParam(VariableElement field, Out out) {
+		if (outParams.containsKey(out.value())) {
+			env.getMessager().printMessage(Kind.ERROR, field.getSimpleName().toString() + " reuses an order value", field);
+		} else {
+			outParams.put(out.value(), field);
+		}
 	}
 
 	private void generateDto(GClass gclass, List<Prop> properties) {
@@ -109,20 +116,20 @@ public class DispatchGenerator {
 
 	private String detectDispatchBasePackage(ProcessingEnvironment env) {
 		String dispatchBasePackage = env.getOptions().get("dispatchBasePackage");
-		if (dispatchBasePackage == null) {
-			// Auto-detect gwt-dispatch
-			TypeElement gwtDispatchAction = env.getElementUtils().getTypeElement("net.customware.gwt.dispatch.shared.Action");
-			// Auto-detect gwt-platform
-			TypeElement gwtpAction = env.getElementUtils().getTypeElement("com.gwtplatform.dispatch.shared.Action");
-			if (gwtDispatchAction != null) {
-				dispatchBasePackage = "net.customware.gwt.dispatch.shared";
-			} else if (gwtpAction != null) {
-				dispatchBasePackage = "com.gwtplatform.dispatch.shared";
-			} else {
-				dispatchBasePackage = "org.gwtmpv.dispatch.shared";
-			}
+		if (dispatchBasePackage != null) {
+			return dispatchBasePackage;
 		}
-		return dispatchBasePackage;
+		// Auto-detect gwt-dispatch
+		TypeElement gwtDispatchAction = env.getElementUtils().getTypeElement("net.customware.gwt.dispatch.shared.Action");
+		// Auto-detect gwt-platform
+		TypeElement gwtpAction = env.getElementUtils().getTypeElement("com.gwtplatform.dispatch.shared.Action");
+		if (gwtDispatchAction != null) {
+			return "net.customware.gwt.dispatch.shared";
+		} else if (gwtpAction != null) {
+			return "com.gwtplatform.dispatch.shared";
+		} else {
+			return "org.gwtmpv.dispatch.shared";
+		}
 	}
 
 	private void addFieldAndGetterAndConstructorArg(GClass gclass, GMethod cstr, String name, String type) {
