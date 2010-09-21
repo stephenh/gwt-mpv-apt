@@ -17,6 +17,9 @@ public class BarPresenter {
 		// would be nice to have strongly-typed with methods
 		@SuppressWarnings("unused")
 		PlaceRequest r = BarPlace.newRequest().with("somename", "somevalue");
+
+		// we can access the NAME constant if needed
+		System.out.println(BarPlace.NAME);
 	}
 
 }

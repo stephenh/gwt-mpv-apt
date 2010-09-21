@@ -1,6 +1,6 @@
 package com.foo.client.dispatch.base;
 
-import net.customware.gwt.dispatch.shared.Result;
+import org.gwtmpv.dispatch.shared.Result;
 
 public class BaseResult implements Result {
 

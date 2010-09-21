@@ -1,7 +1,8 @@
 package com.foo.client.dispatch.base;
 
-import net.customware.gwt.dispatch.shared.Action;
-import net.customware.gwt.dispatch.shared.Result;
+import org.gwtmpv.dispatch.shared.Action;
+import org.gwtmpv.dispatch.shared.Result;
+
 
 public abstract class BaseAction<R extends Result> implements Action<R> {
 
