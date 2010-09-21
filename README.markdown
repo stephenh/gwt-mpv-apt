@@ -114,6 +114,8 @@ Todo
 Changelog
 =========
 
+* 1.10 - 2010-09-21
+  * Add a static `XxxPlace.NAME` field for accessing place names
 * 1.9 - 2010-09-18
   * Add a static `fire` method for each available event bus (`HandlerManager`, gwt-presenter, gwt-mpv, etc.)
 * 1.8 - 2010-09-18

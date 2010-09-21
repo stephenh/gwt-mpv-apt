@@ -60,6 +60,7 @@ public class PlaceGenerator {
 
 	public void generate() {
 		GMethod cstr = p.getConstructor();
+		addStaticPlaceName();
 		addCstrSuperCall(cstr);
 		addCstrStaticMethodArguments(cstr);
 		addCstrFailureCallbackIfNeeded(cstr);
@@ -72,13 +73,17 @@ public class PlaceGenerator {
 		Util.saveCode(env, p, element);
 	}
 
+	private void addStaticPlaceName() {
+		 p.getField("NAME").type("String").setPublic().setStatic().setFinal().initialValue("\"{}\"", place.value());
+	}
+
 	private void addStaticNewRequest() {
 		GMethod m = p.getMethod("newRequest").setStatic().returnType("org.gwtmpv.place.PlaceRequest");
-		m.body.line("return new PlaceRequest(\"{}\");", place.value());
+		m.body.line("return new PlaceRequest(NAME);");
 	}
 
 	private void addCstrSuperCall(GMethod cstr) {
-		cstr.body.line("super(\"{}\");", place.value());
+		cstr.body.line("super(NAME);");
 	}
 
 	private void addCstrStaticMethodArguments(GMethod cstr) {
