@@ -1,11 +1,5 @@
 package com.foo.client.event;
 
-import org.gwtmpv.bus.DefaultEventBus;
-import org.gwtmpv.bus.EventBus;
-
-import com.foo.client.event.BarChangedEvent.BarChangedHandler;
-import com.foo.client.event.FooChangedEvent.FooChangedHandler;
-import com.foo.client.event.GenericChangedEvent.GenericChangedHandler;
 import com.google.gwt.event.shared.HandlerManager;
 
 public class Events {

@@ -31,6 +31,7 @@ public class EventGenerator {
 	private final ProcessingEnvironment env;
 	private final TypeElement element;
 	private final GClass eventClass;
+	private final GClass handlerClass;
 	private final GenEvent eventSpec;
 	private final String handlerName;
 	private final GenericSuffix generics;
@@ -46,15 +47,15 @@ public class EventGenerator {
 		this.generics = new GenericSuffix(element);
 		this.eventClass = new GClass(element.toString().replaceAll("Spec$", "") + generics.varsWithBounds);
 		this.eventSpec = eventSpec;
-		this.handlerName = element.getSimpleName().toString().replaceAll("EventSpec$", "Handler");
-		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
-			+ generics.vars);
+		this.handlerName = element.toString().replaceAll("EventSpec$", "Handler");
+		this.handlerClass = new GClass(handlerName + generics.varsWithBounds);
+		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}>", handlerName + generics.vars);
 		this.eventClass.addAnnotation("@SuppressWarnings(\"all\")");
 		this.properties = MpvUtil.toProperties(findParamsInOrder());
 	}
 
 	public void generate() {
-		generateInnerInterface();
+		generateHandlerClass();
 		generateType();
 		generateDispatch();
 		generateFields();
@@ -64,12 +65,12 @@ public class EventGenerator {
 		PropUtil.addToString(eventClass, properties);
 		PropUtil.addGenerated(eventClass, DispatchGenerator.class);
 		Util.saveCode(env, eventClass);
+		Util.saveCode(env, handlerClass);
 	}
 
-	private void generateInnerInterface() {
-		GClass inner = eventClass.getInnerClass(handlerName + generics.varsWithBounds);
-		inner.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
-		inner.getMethod(getMethodName()).argument(eventClass.getFullClassNameWithoutGeneric() + generics.vars, "event");
+	private void generateHandlerClass() {
+		handlerClass.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
+		handlerClass.getMethod(getMethodName()).argument(eventClass.getFullClassNameWithoutGeneric() + generics.vars, "event");
 	}
 
 	private void generateType() {
