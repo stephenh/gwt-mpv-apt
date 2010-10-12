@@ -42,9 +42,9 @@ public class Events {
 		BarChangedEvent.fire(manager, 1);
 		BoundsChangedEvent.fire(manager, 1, 2);
 
-		EventBus bus = new DefaultEventBus();
-		BarChangedEvent.fire(bus, 1);
-		BoundsChangedEvent.fire(bus, 1, 2);
+		// EventBus bus = new DefaultEventBus();
+		// BarChangedEvent.fire(bus, 1);
+		// BoundsChangedEvent.fire(bus, 1, 2);
 
 		t.fireEvent(new GenericChangedEvent<String>("foo"));
 		// t.fireEvent(new GenericChangedEvent<Integer>(1));

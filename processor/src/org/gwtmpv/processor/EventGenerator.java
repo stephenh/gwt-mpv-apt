@@ -49,6 +49,7 @@ public class EventGenerator {
 		this.handlerName = element.getSimpleName().toString().replaceAll("EventSpec$", "Handler");
 		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}.{}>", eventClass.getSimpleClassNameWithoutGeneric(), handlerName
 			+ generics.vars);
+		this.eventClass.addAnnotation("@SuppressWarnings(\"all\")");
 		this.properties = MpvUtil.toProperties(findParamsInOrder());
 	}
 
@@ -137,7 +138,6 @@ public class EventGenerator {
 		for (String option : Copy.list(
 			"net.customware.gwt.presenter.client.EventBus",
 			"com.gwtplatform.mvp.client.EventBus",
-			"org.gwtmpv.bus.EventBus",
 			"com.google.gwt.event.shared.EventBus")) {
 			TypeElement t = env.getElementUtils().getTypeElement(option);
 			if (t != null) {
