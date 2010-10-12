@@ -1,11 +1,5 @@
 package com.foo.client.event;
 
-import org.gwtmpv.bus.DefaultEventBus;
-import org.gwtmpv.bus.EventBus;
-
-import com.foo.client.event.BarChangedEvent.BarChangedHandler;
-import com.foo.client.event.FooChangedEvent.FooChangedHandler;
-import com.foo.client.event.GenericChangedEvent.GenericChangedHandler;
 import com.google.gwt.event.shared.HandlerManager;
 
 public class Events {
@@ -42,9 +36,9 @@ public class Events {
 		BarChangedEvent.fire(manager, 1);
 		BoundsChangedEvent.fire(manager, 1, 2);
 
-		EventBus bus = new DefaultEventBus();
-		BarChangedEvent.fire(bus, 1);
-		BoundsChangedEvent.fire(bus, 1, 2);
+		// EventBus bus = new DefaultEventBus();
+		// BarChangedEvent.fire(bus, 1);
+		// BoundsChangedEvent.fire(bus, 1, 2);
 
 		t.fireEvent(new GenericChangedEvent<String>("foo"));
 		// t.fireEvent(new GenericChangedEvent<Integer>(1));
