@@ -114,6 +114,10 @@ Todo
 Changelog
 =========
 
+* 1.11 - 2010-10-12
+  * Make handlers their own top-level class (works better for code completion)
+  * Add `SuppressWarnings("all")` for HandlerManager deprecation
+  * Remove gwt-mpv event bus
 * 1.10 - 2010-09-21
   * Add a static `XxxPlace.NAME` field for accessing place names
 * 1.9 - 2010-09-18
