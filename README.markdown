@@ -114,6 +114,8 @@ Todo
 Changelog
 =========
 
+* 1.12 - 2010-11-30
+  * Add `EventBus` parameter to generated `DispatchUiCommand`s
 * 1.11 - 2010-10-12
   * Make handlers their own top-level class (works better for code completion)
   * Add `SuppressWarnings("all")` for HandlerManager deprecation
