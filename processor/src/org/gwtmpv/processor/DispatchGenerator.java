@@ -69,8 +69,12 @@ public class DispatchGenerator {
 		}
 		GClass command = new GClass(simpleName + "Command" + generics.varsWithBounds);
 		command.setAbstract().baseClassName("org.gwtmpv.model.commands.DispatchUiCommand<{}Action{}, {}Result{}>", simpleName, generics.vars, simpleName, generics.vars);
-		GMethod cstr= command.getConstructor().argument("org.gwtmpv.dispatch.client.util.OutstandingDispatchAsync", "async");
-		cstr.body.line("super(async);");
+
+		GMethod cstr = command.getConstructor();
+		cstr.argument("com.google.gwt.event.shared.EventBus", "eventBus");
+		cstr.argument("org.gwtmpv.dispatch.client.util.OutstandingDispatchAsync", "async");
+		cstr.body.line("super(eventBus, async);");
+
 		PropUtil.addGenerated(command, DispatchGenerator.class);
 		Util.saveCode(env, command);
 	}
