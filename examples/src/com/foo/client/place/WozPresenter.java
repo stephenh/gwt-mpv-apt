@@ -1,9 +1,10 @@
 package com.foo.client.place;
 
 import org.gwtmpv.GenPlace;
-import org.gwtmpv.bus.DefaultEventBus;
-import org.gwtmpv.bus.EventBus;
 import org.gwtmpv.place.PlaceRequest;
+
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.SimpleEventBus;
 
 public class WozPresenter {
 
@@ -13,7 +14,7 @@ public class WozPresenter {
 
 	public static void test() {
 		// this isn't async, so we don't need the FailureCallback
-		new WozPlace(new DefaultEventBus());
+		new WozPlace(new SimpleEventBus());
 	}
 
 }

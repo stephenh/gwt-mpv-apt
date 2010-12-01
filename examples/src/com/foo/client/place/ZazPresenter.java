@@ -1,10 +1,11 @@
 package com.foo.client.place;
 
 import org.gwtmpv.GenPlace;
-import org.gwtmpv.bus.DefaultEventBus;
-import org.gwtmpv.bus.EventBus;
 import org.gwtmpv.place.PlaceRequest;
 import org.gwtmpv.util.FailureCallback;
+
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.SimpleEventBus;
 
 public class ZazPresenter {
 
@@ -14,7 +15,7 @@ public class ZazPresenter {
 
 	public static void test() {
 		FailureCallback failureCallback = null;
-		new ZazPlace(new DefaultEventBus(), failureCallback);
+		new ZazPlace(new SimpleEventBus(), failureCallback);
 	}
 
 }
