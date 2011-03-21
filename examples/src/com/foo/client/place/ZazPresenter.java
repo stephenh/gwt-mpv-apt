@@ -9,7 +9,7 @@ import com.google.gwt.event.shared.SimpleEventBus;
 
 public class ZazPresenter {
 
-	@GenPlace("zaz")
+	@GenPlace(name = "zaz")
 	public static void onRequest(EventBus bus, PlaceRequest request) {
 	}
 

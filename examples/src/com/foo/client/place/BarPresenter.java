@@ -6,7 +6,7 @@ import org.gwtmpv.util.FailureCallback;
 
 public class BarPresenter {
 
-	@GenPlace("bar")
+	@GenPlace(name = "bar", params = { "p1", "p2" })
 	public static void onRequest(PlaceRequest request) {
 	}
 
@@ -16,7 +16,13 @@ public class BarPresenter {
 
 		// would be nice to have strongly-typed with methods
 		@SuppressWarnings("unused")
-		PlaceRequest r = BarPlace.newRequest().with("somename", "somevalue");
+		BarPlaceRequest r = BarPlace.newRequest().p1("somename").p2("othername");
+
+		// we can convert a vanilla request to a BarPlaceRequest to get the type-safe accessors
+		PlaceRequest vanillaRequest = new PlaceRequest(BarPlace.NAME);
+		BarPlaceRequest converted = new BarPlaceRequest(vanillaRequest);
+		converted.p1();
+		converted.p2();
 
 		// we can access the NAME constant if needed
 		System.out.println(BarPlace.NAME);

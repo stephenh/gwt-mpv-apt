@@ -5,7 +5,7 @@ import org.gwtmpv.util.FailureCallback;
 
 public class FooPresenter {
 
-	@GenPlace("foo")
+	@GenPlace(name = "foo")
 	public static void onRequest() {
 	}
 
@@ -13,5 +13,5 @@ public class FooPresenter {
 		FailureCallback failureCallback = null;
 		new FooPlace(failureCallback);
 	}
-	
+
 }
