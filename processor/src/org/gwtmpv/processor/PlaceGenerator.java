@@ -10,6 +10,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic.Kind;
 
+import joist.sourcegen.Argument;
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
 import joist.util.Join;
@@ -45,7 +46,8 @@ public class PlaceGenerator {
 	private final ProcessingEnvironment env;
 	private final ExecutableElement element;
 	private final GenPlace place;
-	private final GClass p;
+	private final GClass placeClass;
+	private final GClass placeRequestClass;
 
 	public PlaceGenerator(ProcessingEnvironment env, ExecutableElement element, GenPlace place) throws InvalidTypeElementException {
 		if (!element.getModifiers().contains(Modifier.STATIC)) {
@@ -55,12 +57,15 @@ public class PlaceGenerator {
 		this.env = env;
 		this.element = element;
 		this.place = place;
-		p = new GClass(getPlaceQualifiedClassName()).baseClassName("org.gwtmpv.place.Place");
+		placeClass = new GClass(getPlaceQualifiedClassName()).baseClassName("org.gwtmpv.place.Place");
+		placeRequestClass = new GClass(getPlaceRequestQualifiedClassName()).baseClassName("org.gwtmpv.place.PlaceRequest");
 	}
 
 	public void generate() {
-		GMethod cstr = p.getConstructor();
+		// PlaceClass
+		GMethod cstr = placeClass.getConstructor();
 		addStaticPlaceName();
+		addStaticNewRequest();
 		addCstrSuperCall(cstr);
 		addCstrStaticMethodArguments(cstr);
 		addCstrFailureCallbackIfNeeded(cstr);
@@ -69,17 +74,22 @@ public class PlaceGenerator {
 		} else {
 			addSyncHandleRequest();
 		}
-		addStaticNewRequest();
-		Util.saveCode(env, p, element);
+		Util.saveCode(env, placeClass, element);
+		// PlaceRequestClass
+		addPlaceRequestCstrOne();
+		addPlaceRequestCstrTwo();
+		addPlaceRequestCstrThree();
+		addPlaceRequestParameters();
+		Util.saveCode(env, placeRequestClass, element);
 	}
 
 	private void addStaticPlaceName() {
-		 p.getField("NAME").type("String").setPublic().setStatic().setFinal().initialValue("\"{}\"", place.value());
+		placeClass.getField("NAME").type("String").setPublic().setStatic().setFinal().initialValue("\"{}\"", place.name());
 	}
 
 	private void addStaticNewRequest() {
-		GMethod m = p.getMethod("newRequest").setStatic().returnType("org.gwtmpv.place.PlaceRequest");
-		m.body.line("return new PlaceRequest(NAME);");
+		GMethod m = placeClass.getMethod("newRequest").setStatic().returnType(placeRequestClass.getSimpleClassName());
+		m.body.line("return new {}();", placeRequestClass.getSimpleClassName());
 	}
 
 	private void addCstrSuperCall(GMethod cstr) {
@@ -97,7 +107,7 @@ public class PlaceGenerator {
 				continue;
 			}
 
-			p.getField(paramName).type(paramType).setFinal();
+			placeClass.getField(paramName).type(paramType).setFinal();
 			cstr.argument(paramType, paramName);
 			cstr.body.line("this.{} = {};", paramName, paramName);
 		}
@@ -105,14 +115,14 @@ public class PlaceGenerator {
 
 	private void addCstrFailureCallbackIfNeeded(GMethod cstr) {
 		if (place.async()) {
-			p.getField("failureCallback").type("org.gwtmpv.util.FailureCallback").setFinal();
+			placeClass.getField("failureCallback").type("org.gwtmpv.util.FailureCallback").setFinal();
 			cstr.argument("org.gwtmpv.util.FailureCallback", "failureCallback");
 			cstr.body.line("this.{} = {};", "failureCallback", "failureCallback");
 		}
 	}
 
 	private void addAsyncHandleRequest() {
-		GMethod m = p.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
+		GMethod m = placeClass.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
 		m.body.line("GWT.runAsync(new RunAsyncCallback() {");
 		m.body.line("    public void onSuccess() {");
 		m.body.line("        if (request == null) {");
@@ -125,11 +135,11 @@ public class PlaceGenerator {
 		m.body.line("        failureCallback.onFailure(caught);");
 		m.body.line("    }");
 		m.body.line("});");
-		p.addImports("com.google.gwt.core.client.GWT", "com.google.gwt.core.client.RunAsyncCallback");
+		placeClass.addImports("com.google.gwt.core.client.GWT", "com.google.gwt.core.client.RunAsyncCallback");
 	}
 
 	private void addSyncHandleRequest() {
-		GMethod m = p.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
+		GMethod m = placeClass.getMethod("handleRequest").argument("final org.gwtmpv.place.PlaceRequest", "request");
 		m.body.line("if (request == null) {");
 		m.body.line("    return; // prefetching (not needed, just for consistency)");
 		m.body.line("}");
@@ -154,6 +164,51 @@ public class PlaceGenerator {
 
 	private String getPlaceQualifiedClassName() {
 		return ((TypeElement) element.getEnclosingElement()).getQualifiedName().toString().replace("Presenter", "Place");
+	}
+
+	private String getPlaceRequestQualifiedClassName() {
+		return ((TypeElement) element.getEnclosingElement()).getQualifiedName().toString().replace("Presenter", "PlaceRequest");
+	}
+
+	private void addPlaceRequestCstrOne() {
+		GMethod cstr = placeRequestClass.getConstructor(Argument.arg("PlaceRequest", "request"));
+		cstr.body.line("super(request);");
+		cstr.body.line("if (!{}.NAME.equals(request.getName())) {", placeClass.getSimpleClassName());
+		cstr.body.line("    throw new IllegalArgumentException(\"Wrong place for class: \" + request.getName());");
+		cstr.body.line("}");
+	}
+
+	private void addPlaceRequestCstrTwo() {
+		GMethod cstr = placeRequestClass.getConstructor();
+		cstr.body.line("super({}.NAME);", placeClass.getSimpleClassName());
+	}
+
+	private void addPlaceRequestCstrThree() {
+		if (place.params() == null || place.params().length == 0) {
+			return;
+		}
+		GMethod cstr = placeRequestClass.getConstructor(//
+			Argument.arg(placeRequestClass.getSimpleClassName(), "request"),
+			Argument.arg("String", "param"),
+			Argument.arg("String", "value")).setPrivate();
+		cstr.body.line("super(request, param, value);");
+	}
+
+	private void addPlaceRequestParameters() {
+		if (place.params() == null) {
+			return;
+		}
+		for (String param : place.params()) {
+			GMethod getter = placeRequestClass.getMethod(param).returnType("String");
+			getter.body.line("return getParameter(\"{}\", null);", param);
+
+			GMethod getterWithDefault = placeRequestClass.getMethod(param + "Or", Argument.arg("String", "def")).returnType("String");
+			getterWithDefault.body.line("return getParameter(\"{}\", def);", param);
+
+			GMethod setter = placeRequestClass.getMethod(param, Argument.arg("Object", "value")).returnType(placeRequestClass.getSimpleClassName());
+			setter.body.line("return new {}(this, \"{}\", ObjectUtils.toStr(value, \"\"));", placeRequestClass.getSimpleClassName(), param);
+			placeRequestClass.addImports("org.gwtmpv.util.ObjectUtils");
+		}
 	}
 
 }

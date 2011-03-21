@@ -8,7 +8,7 @@ import com.google.gwt.event.shared.SimpleEventBus;
 
 public class WozPresenter {
 
-	@GenPlace(value = "woz", async = false)
+	@GenPlace(name = "woz", async = false)
 	public static void onRequest(EventBus bus, PlaceRequest request) {
 	}
 
