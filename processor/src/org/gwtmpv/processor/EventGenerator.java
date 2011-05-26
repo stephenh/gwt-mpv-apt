@@ -49,7 +49,11 @@ public class EventGenerator {
 		this.eventSpec = eventSpec;
 		this.handlerName = element.toString().replaceAll("EventSpec$", "Handler");
 		this.handlerClass = new GClass(handlerName + generics.varsWithBounds);
-		this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}>", handlerName + generics.vars);
+		if (eventSpec.gwtEvent()) {
+			this.eventClass.baseClassName("com.google.gwt.event.shared.GwtEvent<{}>", handlerName + generics.vars);
+		} else {
+			this.eventClass.baseClassName("com.google.web.bindery.event.shared.Event<{}>", handlerName + generics.vars);
+		}
 		this.eventClass.addAnnotation("@SuppressWarnings(\"all\")");
 		this.properties = MpvUtil.toProperties(findParamsInOrder());
 	}
@@ -69,7 +73,10 @@ public class EventGenerator {
 	}
 
 	private void generateHandlerClass() {
-		handlerClass.setInterface().baseClassName("com.google.gwt.event.shared.EventHandler");
+		handlerClass.setInterface();
+		if (eventSpec.gwtEvent()) {
+			handlerClass.baseClassName("com.google.gwt.event.shared.EventHandler");
+		}
 		handlerClass.getMethod(getMethodName()).argument(eventClass.getFullClassNameWithoutGeneric() + generics.vars, "event");
 	}
 
@@ -135,11 +142,13 @@ public class EventGenerator {
 
 	private List<String> detectEventBuses(ProcessingEnvironment env) {
 		List<String> available = new ArrayList<String>();
-		available.add("com.google.gwt.event.shared.HandlerManager");
-		for (String option : Copy.list(
+		List<String> options = eventSpec.gwtEvent() ? Copy.list(
+			"com.google.gwt.event.shared.HandlerManager",
+			"com.google.gwt.event.shared.EventBus",
 			"net.customware.gwt.presenter.client.EventBus",
-			"com.gwtplatform.mvp.client.EventBus",
-			"com.google.gwt.event.shared.EventBus")) {
+			"com.gwtplatform.mvp.client.EventBus") : //
+			Copy.list("com.google.web.bindery.event.shared.EventBus");
+		for (String option : options) {
 			TypeElement t = env.getElementUtils().getTypeElement(option);
 			if (t != null) {
 				available.add(option);
