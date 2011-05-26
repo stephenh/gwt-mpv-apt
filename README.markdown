@@ -114,6 +114,10 @@ Todo
 Changelog
 =========
 
+* 2.1 - 2011-05-26
+  * Deleting `XxxSpec` classes now automatically deletes the derived artifacts (used to require a clean build)
+* 2.0 - 2011-05-26
+  * Add support for `com.google.web.bindery` events--by default all events extend the new `Event` unless `@GenEvent(gwtEvent = true)` is used
 * 1.12 - 2010-11-30
   * Add `EventBus` parameter to generated `DispatchUiCommand`s
 * 1.11 - 2010-10-12
