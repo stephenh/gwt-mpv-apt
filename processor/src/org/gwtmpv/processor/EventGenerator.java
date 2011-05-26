@@ -68,8 +68,8 @@ public class EventGenerator {
 		PropUtil.addHashCode(eventClass, properties);
 		PropUtil.addToString(eventClass, properties);
 		PropUtil.addGenerated(eventClass, DispatchGenerator.class);
-		Util.saveCode(env, eventClass);
-		Util.saveCode(env, handlerClass);
+		Util.saveCode(env, eventClass, element);
+		Util.saveCode(env, handlerClass, element);
 	}
 
 	private void generateHandlerClass() {
