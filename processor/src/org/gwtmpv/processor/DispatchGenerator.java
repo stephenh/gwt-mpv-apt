@@ -80,7 +80,7 @@ public class DispatchGenerator {
 		command.getConstructor(arg("org.gwtmpv.dispatch.client.util.OutstandingDispatchAsync", "async")).body.line("super(async);");
 
 		PropUtil.addGenerated(command, DispatchGenerator.class);
-		Util.saveCode(env, command);
+		Util.saveCode(env, command, element);
 	}
 
 	private void addSerialVersionUID() {
