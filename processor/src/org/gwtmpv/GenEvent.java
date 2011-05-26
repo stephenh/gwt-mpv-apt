@@ -7,4 +7,5 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface GenEvent {
 	String methodName() default "";
+	boolean gwtEvent() default false;
 }

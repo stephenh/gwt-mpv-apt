@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Export-Package: org.gwtmpv;x-internal:=true
+Export-Package: org.gwtmpv
 Require-Bundle: org.eclipse.core.runtime,org.eclipse.jdt.apt.core
 Bundle-Vendor: Exigence
 Bundle-Version: 0.0.0

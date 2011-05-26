@@ -10,8 +10,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/annotations.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dispatch-1.1.0-2010012501.jar"/>
-	<classpathentry kind="var" path="GWT_HOME/gwt-dev.jar"/>
-	<classpathentry kind="var" path="GWT_HOME/gwt-user.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-mpv-user.jar"/>
+	<classpathentry exported="true" kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT trunk"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

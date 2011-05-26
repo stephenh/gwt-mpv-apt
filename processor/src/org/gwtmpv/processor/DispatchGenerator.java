@@ -1,5 +1,7 @@
 package org.gwtmpv.processor;
 
+import static joist.sourcegen.Argument.arg;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -68,12 +70,14 @@ public class DispatchGenerator {
 			return;
 		}
 		GClass command = new GClass(simpleName + "Command" + generics.varsWithBounds);
-		command.setAbstract().baseClassName("org.gwtmpv.model.commands.DispatchUiCommand<{}Action{}, {}Result{}>", simpleName, generics.vars, simpleName, generics.vars);
+		command.setAbstract().baseClassName(
+			"org.gwtmpv.model.commands.DispatchUiCommand<{}Action{}, {}Result{}>",
+			simpleName,
+			generics.vars,
+			simpleName,
+			generics.vars);
 
-		GMethod cstr = command.getConstructor();
-		cstr.argument("com.google.gwt.event.shared.EventBus", "eventBus");
-		cstr.argument("org.gwtmpv.dispatch.client.util.OutstandingDispatchAsync", "async");
-		cstr.body.line("super(eventBus, async);");
+		command.getConstructor(arg("org.gwtmpv.dispatch.client.util.OutstandingDispatchAsync", "async")).body.line("super(async);");
 
 		PropUtil.addGenerated(command, DispatchGenerator.class);
 		Util.saveCode(env, command);
