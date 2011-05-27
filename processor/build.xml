@@ -2,6 +2,30 @@
 
 <project name="gwt-mpv-apt" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
+	<property name="maven-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+	<property name="maven-repository-id" value="sonatype-nexus-staging" />
+	
+	<!-- Include the maven ant tasks -->
+	<path id="maven-ant-tasks.classpath" path="bin/lib/build/jars/maven-ant-tasks.jar" />
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+		uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />	
+	
+	<macrodef name="deploy-artifact">
+		<attribute name="file"/>
+		<attribute name="classifier"/>
+	
+		<sequential>
+			<artifact:mvn>
+				<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.1:sign-and-deploy-file" />
+				<arg value="-Durl=${maven-repository-url}" />
+				<arg value="-DrepositoryId=${maven-repository-id}" />
+				<arg value="-DpomFile=bin/poms/${ant.project.name}.pom" />
+				<arg value="-Dfile=@{file}" />
+				<arg value="-Dclassifier=@{classifier}"/>
+				<arg value="-Pgpg" />
+			</artifact:mvn>
+		</sequential>
+	</macrodef>	
 	<target name="clean" description="delete bin/*">
 		<delete dir="bin"/>
 	</target>
@@ -70,6 +94,11 @@
 		<ivy:publish status="release" resolver="maven-share" update="true" overwrite="true" forcedeliver="true" publishivy="false">
 			<artifacts pattern="bin/[type]s/[artifact].[ext]" />
 		</ivy:publish>
+	</target>
+	
+	<target name="oss-maven-stage" depends="jar,ivy-init,gen-pom" description="stage the jars to the sonatype maven repo">
+		<deploy-artifact file="bin/jars/${ant.project.name}.jar" classifier=""/>
+		<deploy-artifact file="bin/sources/${ant.project.name}.jar" classifier="sources"/>
 	</target>
 	<!-- end ivy targets -->
 
