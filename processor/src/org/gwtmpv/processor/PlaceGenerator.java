@@ -23,7 +23,7 @@ import org.gwtmpv.GenPlace;
  *
  * For example:
  * 
- * <code>
+ * <pre>
  *    public class FooPresenter {
  *      &#064;GenPlace("foo")
  *      public static void handleRequest(AppWideState state) {
@@ -31,15 +31,15 @@ import org.gwtmpv.GenPlace;
  *        state.doStuffToShowMe();
  *      }
  *    }
- * </code>
+ * </pre>
  *
  * Generates a {@code FooPlace} class that takes an {@code AppWideState} state
  * as its constructor, e.g.:
  * 
- * <code>
+ * <pre>
  *     PlaceManager m = ...;
  *     m.registerPlace(new FooPlace(appWideState));
- * </code>
+ * </pre>
  */
 public class PlaceGenerator {
 
