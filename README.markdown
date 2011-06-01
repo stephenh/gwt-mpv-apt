@@ -18,7 +18,7 @@ Install
 =======
 
 * Download `gwt-mpv-apt.jar`, put it in your project's classpath
-  * See the [downloads](http://github.com/stephenh/gwt-mpv-apt/downloads) page or the [joist maven repo](http://repo.joist.ws/org/gwtmpv/gwt-mpv-apt/)
+  * See the [downloads](http://github.com/stephenh/gwt-mpv-apt/downloads) page or the [central maven repo search](http://search.maven.org/#search|ga|1|g%3A%22org.gwtmpv%22%20AND%20a%3A%22gwt-mpv-apt%22)
 * In Eclipse, go to Project Settings, Java Compiler, Annotation Processing, and hit "Enable processing specific settings". Go to Factory path and hit "Enable project specific settings". Select the `gwt-mpv-apt.jar`, hit Okay.
 * For `javac`, use JDK6 and it will pick up the processor from your classpath automatically
 
