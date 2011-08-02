@@ -55,7 +55,6 @@ public class DispatchGenerator {
 	public void generate() {
 		setResultBaseClassOrInterface();
 		setActionBaseClassOrInterface();
-		addSerialVersionUID();
 		addAnnotatedInAndOutParams();
 		generateDto(actionClass, MpvUtil.toProperties(inParams.values()));
 		generateDto(resultClass, MpvUtil.toProperties(outParams.values()));
@@ -81,11 +80,6 @@ public class DispatchGenerator {
 
 		PropUtil.addGenerated(command, DispatchGenerator.class);
 		Util.saveCode(env, command, element);
-	}
-
-	private void addSerialVersionUID() {
-		this.actionClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
-		this.resultClass.getField("serialVersionUID").type("long").setStatic().setFinal().initialValue("1L");
 	}
 
 	private void addAnnotatedInAndOutParams() {

@@ -22,24 +22,24 @@ import org.gwtmpv.GenPlace;
  * Generates Place classes that wrap the boilerplate {@code GWT.runAsync} and call presenter static methods when requested.
  *
  * For example:
- *
- * <code>
+ * 
+ * <pre>
  *    public class FooPresenter {
- *      @GenPlace("foo")
+ *      &#064;GenPlace("foo")
  *      public static void handleRequest(AppWideState state) {
  *        // called when FooPlace is fired
  *        state.doStuffToShowMe();
  *      }
  *    }
- * </code>
+ * </pre>
  *
  * Generates a {@code FooPlace} class that takes an {@code AppWideState} state
  * as its constructor, e.g.:
  * 
- * <code>
+ * <pre>
  *     PlaceManager m = ...;
  *     m.registerPlace(new FooPlace(appWideState));
- * </code>
+ * </pre>
  */
 public class PlaceGenerator {
 

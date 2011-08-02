@@ -1,7 +1,31 @@
 <?xml version="1.0"?>
 
-<project name="gwt-mpv-apt" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="gwt-mpv-apt" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
+	<property name="maven-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+	<property name="maven-repository-id" value="sonatype-nexus-staging" />
+	
+	<path id="compile.classpath">
+		<fileset dir="bin/lib/build/jars" includes="*.jar"/>
+	</path>
+	
+	<macrodef name="deploy-maven-artifact" description="Deploys an artifact with a specified classifier on a maven repository">
+		<attribute name="file"/>
+		<attribute name="classifier"/>
+	
+		<sequential>
+			<artifact:mvn>
+				<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.1:sign-and-deploy-file" />
+				<arg value="-Durl=${maven-repository-url}" />
+				<arg value="-DrepositoryId=${maven-repository-id}" />
+				<arg value="-DpomFile=bin/poms/${ant.project.name}.pom" />
+				<arg value="-Dfile=@{file}" />
+				<arg value="-Dclassifier=@{classifier}"/>
+				<arg value="-Pgpg" />
+			</artifact:mvn>
+		</sequential>
+	</macrodef>	
+	
 	<target name="clean" description="delete bin/*">
 		<delete dir="bin"/>
 	</target>
@@ -15,11 +39,8 @@
 
 	<target name="compile" depends="ivy-retrieve">
 		<mkdir dir="bin/main"/>
-		<javac srcdir="src" destdir="bin/main" debug="true" nowarn="yes" source="1.6" target="1.6" encoding="utf8">
-			<classpath>
-				<fileset dir="bin/lib/build/jars" includes="*.jar"/>
-			</classpath>
-		</javac>
+		<javac srcdir="src" destdir="bin/main" debug="true" nowarn="yes" source="1.6" target="1.6" encoding="utf8"
+			classpathref="compile.classpath"/>
 	</target>
 
 	<target name="jar" depends="compile" description="jarjars the processor and its dependencies">
@@ -42,6 +63,12 @@
 		</zip>
 	</target>
 
+	<target name="javadoc">
+		<javadoc sourcepath="src" destdir="bin/javadoc" classpathref="compile.classpath"/>
+		<mkdir dir="bin/javadocs"/>
+		<jar basedir="bin/javadoc" destfile="bin/javadocs/${ant.project.name}.jar"/>
+	</target>
+	
 	<!-- start ivy targets -->
 	<property name="ivy.jar.version" value="2.1.0"/>
 	<property name="ivy.jar.name" value="ivy-${ivy.jar.version}.jar"/>
@@ -71,7 +98,19 @@
 			<artifacts pattern="bin/[type]s/[artifact].[ext]" />
 		</ivy:publish>
 	</target>
+	
 	<!-- end ivy targets -->
+	
+	<target name="maven-stage" depends="jar,javadoc,gen-pom,ivy-retrieve" description="stage the jars to the sonatype maven repo">
+		<!-- Include the maven ant tasks -->
+		<path id="maven-ant-tasks.classpath" path="bin/lib/build/jars/maven-ant-tasks.jar" />
+		<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+			uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />
+			
+		<deploy-maven-artifact file="bin/jars/${ant.project.name}.jar" classifier=""/>
+		<deploy-maven-artifact file="bin/sources/${ant.project.name}.jar" classifier="sources"/>
+		<deploy-maven-artifact file="bin/javadocs/${ant.project.name}.jar" classifier="javadoc"/>
+	</target>
 
 </project>
 

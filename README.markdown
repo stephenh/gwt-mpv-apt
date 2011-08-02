@@ -18,7 +18,7 @@ Install
 =======
 
 * Download `gwt-mpv-apt.jar`, put it in your project's classpath
-  * See the [downloads](http://github.com/stephenh/gwt-mpv-apt/downloads) page or the [joist maven repo](http://repo.joist.ws/org/gwtmpv/gwt-mpv-apt/)
+  * See the [downloads](http://github.com/stephenh/gwt-mpv-apt/downloads) page or the [central maven repo search](http://search.maven.org/#search|ga|1|g%3A%22org.gwtmpv%22%20AND%20a%3A%22gwt-mpv-apt%22)
 * In Eclipse, go to Project Settings, Java Compiler, Annotation Processing, and hit "Enable processing specific settings". Go to Factory path and hit "Enable project specific settings". Select the `gwt-mpv-apt.jar`, hit Okay.
 * For `javac`, use JDK6 and it will pick up the processor from your classpath automatically
 
@@ -114,6 +114,10 @@ Todo
 Changelog
 =========
 
+* 2.1 - 2011-05-26
+  * Deleting `XxxSpec` classes now automatically deletes the derived artifacts (used to require a clean build)
+* 2.0 - 2011-05-26
+  * Add support for `com.google.web.bindery` events--by default all events extend the new `Event` unless `@GenEvent(gwtEvent = true)` is used
 * 1.12 - 2010-11-30
   * Add `EventBus` parameter to generated `DispatchUiCommand`s
 * 1.11 - 2010-10-12
