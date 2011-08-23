@@ -22,6 +22,43 @@ Install
 * In Eclipse, go to Project Settings, Java Compiler, Annotation Processing, and hit "Enable processing specific settings". Go to Factory path and hit "Enable project specific settings". Select the `gwt-mpv-apt.jar`, hit Okay.
 * For `javac`, use JDK6 and it will pick up the processor from your classpath automatically
 
+Maven
+=====
+
+To work with annotation processors in Maven, your `pom.xml` should look vaguely like:
+
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>2.3.2</version>
+      <configuration>
+        <source>1.6</source>
+        <target>1.6</target>
+        <generatedSourcesDirectory>${project.build.directory}/generated-sources/apt</generatedSourcesDirectory>
+      </configuration>
+    </plugin>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>build-helper-maven-plugin</artifactId>
+      <version>1.5</version>
+      <executions>
+          <execution>
+              <id>add-source</id>
+              <phase>generate-sources</phase>
+              <goals>
+                  <goal>add-source</goal>
+              </goals>
+              <configuration>
+                  <sources>
+                      <source>${project.build.directory}/generated-sources/apt</source>
+                  </sources>
+              </configuration>
+          </execution>
+      </executions>
+    </plugin>
+
+(Thanks to [Andrew Green](https://github.com/AndrewGreen).)
+
 Examples
 ========
 
