@@ -151,6 +151,9 @@ Todo
 Changelog
 =========
 
+* 2.2 - 2011-08-22
+  * Remove unneeded `serialVersionUID` fields
+  * Now available in the Maven central repository
 * 2.1 - 2011-05-26
   * Deleting `XxxSpec` classes now automatically deletes the derived artifacts (used to require a clean build)
 * 2.0 - 2011-05-26
