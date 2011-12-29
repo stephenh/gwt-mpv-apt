@@ -1,7 +1,7 @@
 
-**Note:** As of December 2011, `gwt-mpv-apt` was merged into it's sister project, gwt-mpv, which was renamed Tessell. See [tessell.org](http://www.tessell.org) for more information. The `tessell-apt` 2.0.0 release (which syncs the version number with the rest of Tessell) is the same as `gwt-mpv-apt` 2.2, except with `org.tessell` package names.
+**Note:** As of December 2011, `gwt-mpv-apt` was merged into it's sister project, gwt-mpv, which was renamed Tessell. See [tessell.org](http://www.tessell.org) for more information. The `tessell-apt` 2.0.0 release (which syncs the version number with the rest of Tessell) is functionality equivalent to the `gwt-mpv-apt` 2.2 release, except with `org.tessell` package names.
 
-This does not necessarily mean `gwt-mpv-apt` is dead. If `gwt-mpv-apt` users need any bug fixes or future features done here instead of migrating to `tessell-apt`, post-2.2 releases are still possible, just somewhat unlikely given the codebase was already fairly mature and stable.
+This does not necessarily mean `gwt-mpv-apt` is dead. If `gwt-mpv-apt` users need any bug fixes or future features done here instead of migrating to `tessell-apt`, post-2.2 releases are still possible, just somewhat unlikely given the `gwt-mpv-ap` codebase was already fairly mature and stable.
 
 ---
 
